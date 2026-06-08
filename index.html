@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SAVC — Domínio Total & Megacode</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Space+Mono:wght@400;700&display=swap');
+
+  :root {
+    --bg: #070a0f; --surface: #0f1219; --surface2: #161b25; --border: #1d2433;
+    --accent: #e8433a; --accent2: #ff8c42; --accent3: #4ade80; --accent4: #38bdf8;
+    --green: #4ade80; --blue: #38bdf8; --yellow: #fbbf24; --purple: #a78bfa;
+    --text: #e8eaf0; --text2: #878fa6; --text3: #4a5168; --grid: #1a2430; --ecg: #4ade80;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Syne', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
+  
+  /* HEADER & NAV */
+  header { 
+    padding: 18px 24px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(7,10,15,0.96); backdrop-filter: blur(10px);
+  }
+  .logo { font-size: 1.1rem; font-weight: 800; letter-spacing: -0.02em; }
+  .logo span { color: var(--accent); }
+  .stat-mini { font-family: 'Space Mono', monospace; font-size: 0.68rem; color: var(--text2); text-align: right; }
+  
+  nav { display: flex; gap: 4px; padding: 14px 24px; border-bottom: 1px solid var(--border); overflow-x: auto; scrollbar-width: none; }
+  nav::-webkit-scrollbar { display: none; }
+  .nav-btn {
+    font-family: 'Space Mono', monospace; font-size: 0.68rem;
+    padding: 7px 14px; border-radius: 6px; border: 1px solid var(--border);
+    background: transparent; color: var(--text2); cursor: pointer;
+    white-space: nowrap; transition: all 0.2s; letter-spacing: 0.03em;
+  }
+  .nav-btn:hover { border-color: var(--accent); color: var(--text); }
+  .nav-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+  /* MAIN COMPONENTS */
+  main { padding: 24px; max-width: 920px; margin: 0 auto; }
+  .section { display: none; animation: fade 0.3s ease; }
+  .section.active { display: block; }
+  @keyframes fade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+  h2 { font-size: 1.5rem; font-weight: 800; margin-bottom: 6px; }
+  .subtitle { color: var(--text2); font-family: 'Space Mono', monospace; font-size: 0.74rem; margin-bottom: 26px; }
+  .sep { height: 1px; background: var(--border); margin: 26px 0; }
+
+  /* BUTTONS */
+  .btn {
+    font-family: 'Space Mono', monospace; font-size: 0.72rem;
+    padding: 9px 18px; border-radius: 8px; border: 1px solid var(--border);
+    background: var(--surface); color: var(--text); cursor: pointer; transition: all 0.2s;
+  }
+  .btn:hover { border-color: var(--accent); background: rgba(232,67,58,0.08); }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btn.primary:hover { background: #d43830; }
+  .btn.green { background: rgba(74,222,128,0.12); border-color: var(--green); color: var(--green); }
+  .btn.blue { background: rgba(56,189,248,0.12); border-color: var(--blue); color: var(--blue); }
+
+  /* OVERVIEW GRID */
+  .overview-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+  .overview-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 22px; transition: all 0.2s; cursor: pointer; }
+  .overview-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .overview-card h3 { font-size: 0.95rem; font-weight: 700; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+  .overview-card ul { font-size: 0.84rem; color: var(--text2); padding-left: 14px; line-height: 1.7; }
+  .ov-badge { font-size: 0.7rem; padding: 2px 8px; border-radius: 4px; font-family: 'Space Mono', monospace; }
+  .badge-red { background: rgba(232,67,58,0.2); color: var(--accent); }
+  .badge-blue { background: rgba(56,189,248,0.2); color: var(--accent4); }
+  .badge-green { background: rgba(74,222,128,0.2); color: var(--accent3); }
+  .badge-yellow { background: rgba(251,191,36,0.2); color: var(--yellow); }
+  .badge-orange { background: rgba(255,140,66,0.2); color: var(--accent2); }
+
+  /* ALGORITHMS */
+  .algo-box { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 28px; margin-bottom: 20px; }
+  .algo-step { display: flex; gap: 16px; margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
+  .algo-step:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+  .step-num { width: 32px; height: 32px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; font-family: 'Space Mono', monospace; font-size: 0.75rem; font-weight: 700; flex-shrink: 0; margin-top: 2px; }
+  .step-num.blue { background: var(--accent4); }
+  .step-num.green { background: var(--accent3); color: #000; }
+  .step-num.yellow { background: var(--yellow); color: #000; }
+  .step-content h4 { font-weight: 700; font-size: 0.95rem; margin-bottom: 4px; }
+  .step-content p, .step-content ul { font-size: 0.88rem; color: var(--text2); line-height: 1.6; }
+  .step-content ul { padding-left: 16px; margin-top: 4px; }
+  .highlight { color: var(--accent); font-weight: 700; }
+  .decision-box { background: rgba(232,67,58,0.08); border: 1px solid rgba(232,67,58,0.3); border-radius: 10px; padding: 14px 16px; margin: 12px 0; font-size: 0.88rem; }
+
+  /* ECG MONITOR */
+  .monitor { background: #04080a; border: 1px solid var(--border); border-radius: 14px; padding: 0; overflow: hidden; position: relative; box-shadow: inset 0 0 60px rgba(74,222,128,0.04); }
+  .monitor-head { display: flex; justify-content: space-between; align-items: center; padding: 12px 18px; border-bottom: 1px solid rgba(74,222,128,0.1); background: rgba(74,222,128,0.02); }
+  .monitor-lead { font-family: 'Space Mono', monospace; font-size: 0.7rem; color: var(--green); letter-spacing: 0.1em; }
+  .monitor-hr { font-family: 'Space Mono', monospace; font-size: 0.95rem; color: var(--green); font-weight: 700; }
+  .monitor-hr span { font-size: 0.62rem; color: var(--text2); }
+  .ecg-svg { width: 100%; display: block; background: repeating-linear-gradient(0deg,transparent,transparent 19px,var(--grid) 19px,var(--grid) 20px), repeating-linear-gradient(90deg,transparent,transparent 19px,var(--grid) 19px,var(--grid) 20px); }
+  .ecg-trace { fill: none; stroke: var(--ecg); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; filter: drop-shadow(0 0 3px rgba(74,222,128,0.5)); }
+  .ecg-trace.danger { stroke: var(--accent); --ecg: var(--accent); filter: drop-shadow(0 0 3px rgba(232,67,58,0.5)); }
+  
+  /* ATLAS & TRAINING CARDS */
+  .rhythm-meta { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 22px; margin-top: 16px; }
+  .rhythm-name { font-size: 1.25rem; font-weight: 800; margin-bottom: 4px; }
+  .rhythm-cat { display: inline-block; font-family: 'Space Mono', monospace; font-size: 0.62rem; padding: 3px 9px; border-radius: 5px; margin-bottom: 14px; letter-spacing: 0.06em; }
+  .cat-chocavel { background: rgba(232,67,58,0.18); color: var(--accent); }
+  .cat-naochocavel { background: rgba(167,139,250,0.18); color: var(--purple); }
+  .cat-brady { background: rgba(56,189,248,0.18); color: var(--blue); }
+  .cat-taqui { background: rgba(251,191,36,0.18); color: var(--yellow); }
+  .crit-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin: 16px 0; }
+  .crit { background: var(--surface2); border-radius: 8px; padding: 10px 12px; }
+  .crit-label { font-family: 'Space Mono', monospace; font-size: 0.58rem; color: var(--text3); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 3px; }
+  .crit-val { font-size: 0.82rem; font-weight: 600; line-height: 1.3; }
+  .theory-block { margin-top: 16px; }
+  .theory-block h4 { font-size: 0.78rem; font-family: 'Space Mono', monospace; color: var(--accent2); letter-spacing: 0.05em; margin-bottom: 8px; text-transform: uppercase; }
+  .theory-block p, .theory-block ul { font-size: 0.88rem; line-height: 1.65; color: var(--text); }
+  .conduct { background: rgba(74,222,128,0.06); border-left: 3px solid var(--green); border-radius: 8px; padding: 12px 14px; margin-top: 8px; font-size: 0.86rem; line-height: 1.6; }
+  .pitfall { background: rgba(232,67,58,0.06); border-left: 3px solid var(--accent); border-radius: 8px; padding: 12px 14px; margin-top: 10px; font-size: 0.86rem; line-height: 1.6; }
+  
+  .rhythm-pager { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px; }
+  .rhythm-chip { font-family: 'Space Mono', monospace; font-size: 0.64rem; padding: 6px 11px; border-radius: 6px; border: 1px solid var(--border); background: transparent; color: var(--text2); cursor: pointer; transition: all 0.2s; }
+  .rhythm-chip:hover { border-color: var(--green); color: var(--text); }
+  .rhythm-chip.active { background: var(--green); border-color: var(--green); color: #000; font-weight: 700; }
+
+  /* TRAIN OPTIONS */
+  .train-opts { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-top: 16px; }
+  .train-opt { padding: 12px 14px; border-radius: 9px; border: 1px solid var(--border); background: var(--surface2); cursor: pointer; font-size: 0.82rem; transition: all 0.2s; text-align: left; font-weight: 600; }
+  .train-opt:hover:not(.locked) { border-color: var(--green); background: rgba(74,222,128,0.06); }
+  .train-opt.correct { border-color: var(--green); background: rgba(74,222,128,0.14); color: var(--green); }
+  .train-opt.incorrect { border-color: var(--accent); background: rgba(232,67,58,0.12); color: var(--accent); }
+  .train-opt.locked { cursor: default; }
+  .train-feedback { margin-top: 16px; padding: 16px; border-radius: 10px; display: none; }
+  .train-feedback.show { display: block; }
+  .train-feedback.right { background: rgba(74,222,128,0.1); border: 1px solid var(--green); }
+  .train-feedback.wrong { background: rgba(232,67,58,0.1); border: 1px solid var(--accent); }
+  .score-pill { font-family: 'Space Mono', monospace; font-size: 0.7rem; color: var(--text2); text-align: center; margin-top: 14px; }
+
+  /* FLASHCARDS */
+  .flashcard-container { perspective: 1000px; margin: 0 auto 24px; max-width: 640px; }
+  .flashcard { width: 100%; min-height: 280px; position: relative; transform-style: preserve-3d; transition: transform 0.5s ease; cursor: pointer; }
+  .flashcard.flipped { transform: rotateY(180deg); }
+  .card-face { position: absolute; width: 100%; min-height: 280px; backface-visibility: hidden; border-radius: 16px; padding: 32px; display: flex; flex-direction: column; justify-content: center; border: 1px solid var(--border); }
+  .card-front { background: var(--surface); }
+  .card-back { background: var(--surface2); transform: rotateY(180deg); border-color: var(--accent); }
+  .card-label { font-family: 'Space Mono', monospace; font-size: 0.65rem; color: var(--text3); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 16px; }
+  .card-text { font-size: 1.05rem; font-weight: 600; line-height: 1.6; }
+  .card-answer { font-size: 0.95rem; line-height: 1.7; color: var(--text); }
+  .card-tag { display: inline-block; font-size: 0.65rem; font-family: 'Space Mono', monospace; padding: 3px 8px; border-radius: 4px; background: rgba(232,67,58,0.15); color: var(--accent); margin-bottom: 12px; }
+
+  /* RECALL WRITTEN */
+  .recall-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 24px; margin-bottom: 16px; }
+  .recall-q { font-size: 1.05rem; font-weight: 600; line-height: 1.6; margin-bottom: 18px; }
+  .recall-input { width: 100%; min-height: 120px; background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 14px; color: var(--text); font-family: 'Syne', sans-serif; font-size: 0.92rem; line-height: 1.6; resize: vertical; }
+  .recall-input:focus { outline: none; border-color: var(--blue); }
+  .model-answer { margin-top: 16px; padding: 16px; border-radius: 10px; background: var(--surface2); border-left: 3px solid var(--green); display: none; }
+  .model-answer.show { display: block; }
+  .keypoint { display: flex; gap: 8px; align-items: flex-start; margin-bottom: 6px; font-size: 0.83rem; color: var(--text2); }
+  .keypoint::before { content: '▸'; color: var(--green); flex-shrink: 0; }
+
+  /* MEGACODE */
+  .mega-scene { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 24px; margin-bottom: 16px; }
+  .mega-vitals { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+  .vital { font-family: 'Space Mono', monospace; font-size: 0.68rem; padding: 5px 10px; border-radius: 6px; background: var(--surface2); border: 1px solid var(--border); }
+  .vital b { color: var(--green); }
+  .vital.bad b { color: var(--accent); }
+  .vital.warn b { color: var(--yellow); }
+  .mega-narrative { font-size: 0.95rem; line-height: 1.65; margin-bottom: 8px; }
+  .mega-prompt { font-weight: 700; font-size: 0.95rem; margin: 16px 0 12px; color: var(--accent2); }
+  .mega-opts { display: flex; flex-direction: column; gap: 9px; }
+  .mega-opt { padding: 13px 16px; border-radius: 9px; border: 1px solid var(--border); background: var(--surface2); cursor: pointer; font-size: 0.88rem; transition: all 0.2s; text-align: left; }
+  .mega-opt:hover:not(.locked) { border-color: var(--blue); background: rgba(56,189,248,0.06); }
+  .mega-opt.correct { border-color: var(--green); background: rgba(74,222,128,0.12); color: var(--green); }
+  .mega-opt.wrong { border-color: var(--accent); background: rgba(232,67,58,0.12); color: var(--accent); }
+  .mega-opt.locked { cursor: default; }
+  .mega-exp { margin-top: 14px; padding: 14px; border-radius: 10px; background: var(--surface2); border-left: 3px solid var(--blue); font-size: 0.85rem; display: none; }
+  .mega-exp.show { display: block; }
+  .mega-progress { display: flex; gap: 4px; margin-bottom: 18px; }
+  .mega-dot { flex: 1; height: 4px; border-radius: 2px; background: var(--border); }
+  .mega-dot.done { background: var(--green); }
+  .mega-dot.current { background: var(--accent); }
+
+  /* QUIZ */
+  .quiz-score { text-align: center; padding: 40px 24px; }
+  .score-num { font-size: 4rem; font-weight: 800; color: var(--accent3); line-height: 1; }
+
+  /* TABLES (Farmacologia / Tempos) */
+  .table-scroll { overflow-x: auto; margin: -4px; padding: 4px; }
+  .pharma-table, .times-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+  .pharma-table th, .times-table th { background: var(--surface2); color: var(--text2); font-family: 'Space Mono', monospace; font-size: 0.65rem; text-transform: uppercase; padding: 10px 14px; text-align: left; border-bottom: 2px solid var(--border); }
+  .pharma-table td, .times-table td { padding: 11px 14px; border-bottom: 1px solid var(--border); vertical-align: top; line-height: 1.5; }
+  .drug-name { font-weight: 700; color: var(--accent2); }
+  .time-val { font-family: 'Space Mono', monospace; color: var(--accent); font-weight: 700; }
+  .dose { font-family: 'Space Mono', monospace; color: var(--accent4); font-size: 0.8rem; }
+  .indication-tag { display: inline-block; font-size: 0.62rem; padding: 2px 7px; border-radius: 4px; margin: 2px; font-family: 'Space Mono', monospace; }
+  
+  /* Hs e Ts */
+  .hs-ts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .hs-box, .ts-box { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+  .hs-box { border-top: 3px solid var(--accent4); }
+  .ts-box { border-top: 3px solid var(--accent); }
+  .hs-ts-item { display: flex; gap: 10px; margin-bottom: 10px; align-items: flex-start; }
+  .hs-ts-letter { font-size: 1.1rem; font-weight: 800; width: 22px; flex-shrink: 0; }
+
+  .alert-box { background: rgba(232,67,58,0.08); border: 1px solid rgba(232,67,58,0.3); border-radius: 10px; padding: 14px 16px; font-size: 0.86rem; line-height: 1.6; margin: 12px 0; }
+  .alert-box.blue { background: rgba(56,189,248,0.08); border-color: rgba(56,189,248,0.3); }
+
+  @media(max-width: 600px) { main { padding: 16px; } .hs-ts-grid { grid-template-columns: 1fr; } header, nav { padding-left: 16px; padding-right: 16px; } }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">SAVC <span>///</span> Hub Central</div>
+  <div class="stat-mini" id="globalStat">Sistema Pronto</div>
+</header>
+
+<nav>
+  <button class="nav-btn active" onclick="showSection('overview')">Visão Geral</button>
+  <button class="nav-btn" onclick="showSection('algorithms')">Algoritmos</button>
+  <button class="nav-btn" onclick="showSection('atlas')">Atlas ECG</button>
+  <button class="nav-btn" onclick="showSection('train')">Treino Visual</button>
+  <button class="nav-btn" onclick="showSection('recall')">Recall Escrito</button>
+  <button class="nav-btn" onclick="showSection('flashcards')">Flashcards</button>
+  <button class="nav-btn" onclick="showSection('quiz')">Quiz</button>
+  <button class="nav-btn" onclick="showSection('megacode')">Megacode</button>
+  <button class="nav-btn" onclick="showSection('pharma')">Farmacologia</button>
+  <button class="nav-btn" onclick="showSection('times')">Tempos-Alvo</button>
+  <button class="nav-btn" onclick="showSection('hsts')">Hs & Ts</button>
+</nav>
+
+<main>
+
+<div class="section active" id="overview">
+  <h2>Mapa do SAVC</h2>
+  <p class="subtitle">// estrutura do curso — clique em um módulo para acessar o algoritmo</p>
+  <div class="overview-grid">
+    <div class="overview-card" onclick="showSection('algorithms'); showAlgo('pcr', document.querySelector('[data-algo=pcr]'))">
+      <h3><span class="ov-badge badge-red">PCR</span> Parada Cardiorrespiratória</h3>
+      <ul><li>FV / TVSP → desfibrilação</li><li>Assístole / AESP → causas reversíveis</li><li>RCP alta qualidade</li></ul>
+    </div>
+    <div class="overview-card" onclick="showSection('algorithms'); showAlgo('sca', document.querySelector('[data-algo=sca]'))">
+      <h3><span class="ov-badge badge-orange">SCA</span> Síndromes Coronárias</h3>
+      <ul><li>IAMST → reperfusão 90 min</li><li>MONA: Morfina, O₂, Nitrato, Aspirina</li></ul>
+    </div>
+    <div class="overview-card" onclick="showSection('algorithms'); showAlgo('avc', document.querySelector('[data-algo=avc]'))">
+      <h3><span class="ov-badge badge-green">AVC</span> Acidente Vascular</h3>
+      <ul><li>CPSS: face, braço, fala</li><li>Alteplase: janela 3h / 4,5h</li></ul>
+    </div>
+    <div class="overview-card" onclick="showSection('algorithms'); showAlgo('brady', document.querySelector('[data-algo=brady]'))">
+      <h3><span class="ov-badge badge-blue">BRADY</span> Bradicardia</h3>
+      <ul><li>Instável: FC &lt;50/min + sintomas</li><li>Atropina 1mg IV (máx 3mg)</li><li>MPTC</li></ul>
+    </div>
+    <div class="overview-card" onclick="showSection('algorithms'); showAlgo('taqui', document.querySelector('[data-algo=taqui]'))">
+      <h3><span class="ov-badge badge-yellow">TAQUI</span> Taquicardia</h3>
+      <ul><li>Instável → cardioversão sincronizada</li><li>TV monomórfica estável → amiodarona</li></ul>
+    </div>
+  </div>
+</div>
+
+<div class="section" id="algorithms">
+  <h2>Algoritmos SAVC</h2>
+  <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:24px;">
+    <button class="btn" data-algo="pcr" onclick="showAlgo('pcr', this)">PCR FV/TVSP</button>
+    <button class="btn" data-algo="aesp" onclick="showAlgo('aesp', this)">PCR AESP/Assístole</button>
+    <button class="btn" data-algo="sca" onclick="showAlgo('sca', this)">SCA</button>
+    <button class="btn" data-algo="avc" onclick="showAlgo('avc', this)">AVC</button>
+    <button class="btn" data-algo="brady" onclick="showAlgo('brady', this)">Bradicardia</button>
+    <button class="btn" data-algo="taqui" onclick="showAlgo('taqui', this)">Taquicardia</button>
+    <button class="btn" data-algo="pospcr" onclick="showAlgo('pospcr', this)">Pós-PCR</button>
+  </div>
+  <div id="algoContent"></div>
+</div>
+
+<div class="section" id="atlas">
+  <h2>Atlas de Ritmos</h2>
+  <div class="rhythm-pager" id="rhythmPager"></div>
+  <div class="monitor">
+    <div class="monitor-head">
+      <div class="monitor-lead" id="atlasLead">DII</div>
+      <div class="monitor-hr"><span>FC </span><span id="atlasHR">—</span></div>
+    </div>
+    <svg class="ecg-svg" id="atlasSvg" viewBox="0 0 600 140" preserveAspectRatio="none" height="140"></svg>
+  </div>
+  <div class="rhythm-meta" id="atlasMeta"></div>
+</div>
+
+<div class="section" id="train">
+  <h2>Treino Visual de Ritmos</h2>
+  <div class="monitor">
+    <div class="monitor-head">
+      <div class="monitor-lead">MONITOR</div>
+      <div class="monitor-hr"><span>FC </span><span id="trainHR">—</span></div>
+    </div>
+    <svg class="ecg-svg" id="trainSvg" viewBox="0 0 600 140" preserveAspectRatio="none" height="140"></svg>
+  </div>
+  <div class="train-opts" id="trainOpts"></div>
+  <div class="train-feedback" id="trainFeedback"></div>
+  <div style="display:flex;justify-content:center;margin-top:16px;">
+    <button class="btn primary" onclick="nextTrain()" id="trainNext" style="display:none">Próximo ritmo →</button>
+  </div>
+  <div class="score-pill" id="trainScore">0 acertos · 0 tentativas</div>
+</div>
+
+<div class="section" id="recall">
+  <h2>Recall Escrito</h2>
+  <p class="subtitle">// escreva sua resposta de memória para forçar o recall ativo</p>
+  <div class="recall-card">
+    <span class="recall-tag" id="recallTag">—</span>
+    <div class="recall-q" id="recallQ">—</div>
+    <textarea class="recall-input" id="recallInput" placeholder="Digite tudo o que você sabe sobre isso..."></textarea>
+    <div style="display:flex; gap:10px; margin-top:12px;">
+      <button class="btn primary" onclick="revealModel()" id="revealBtn">Revelar gabarito</button>
+      <button class="btn" onclick="nextRecall()">Pular →</button>
+    </div>
+    <div class="model-answer" id="modelAnswer">
+      <p id="modelText"></p>
+      <div id="modelKeys"></div>
+    </div>
+  </div>
+</div>
+
+<div class="section" id="flashcards">
+  <h2>Flashcards</h2>
+  <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:20px;" id="deckButtons">
+    <button class="btn primary" onclick="loadDeck('all')">Todos</button>
+    <button class="btn" onclick="loadDeck('pcr')">PCR</button>
+    <button class="btn" onclick="loadDeck('brady')">Bradicardia</button>
+    <button class="btn" onclick="loadDeck('taqui')">Taquicardia</button>
+  </div>
+  <div class="flashcard-container">
+    <div class="flashcard" id="flashcard" onclick="flipCard()">
+      <div class="card-face card-front">
+        <div class="card-label">Pergunta</div>
+        <div class="card-tag" id="cardTag">PCR</div>
+        <div class="card-text" id="cardQuestion">Carregando...</div>
+      </div>
+      <div class="card-face card-back">
+        <div class="card-label">Resposta</div>
+        <div class="card-answer" id="cardAnswer">—</div>
+      </div>
+    </div>
+  </div>
+  <div style="display:flex; gap:10px; justify-content:center;">
+    <button class="btn" onclick="prevCard()">←</button>
+    <button class="btn" onclick="nextCard()">→</button>
+    <button class="btn" onclick="shuffleDeck()">⇌ Embaralhar</button>
+  </div>
+</div>
+
+<div class="section" id="quiz">
+  <h2>Quiz SAVC</h2>
+  <div id="quizContent"></div>
+</div>
+
+<div class="section" id="megacode">
+  <h2>Megacode Simulado</h2>
+  <div id="megaSelect" style="display:flex;flex-direction:column;gap:10px">
+    <button class="btn primary" style="text-align:left;padding:16px" onclick="startMega(0)"><b>Caso 1 — Colapso súbito (FV)</b></button>
+    <button class="btn" style="text-align:left;padding:16px;border-color:var(--purple)" onclick="startMega(1)"><b>Caso 2 — Pós-cirúrgica (AESP)</b></button>
+    <button class="btn" style="text-align:left;padding:16px;border-color:var(--blue)" onclick="startMega(2)"><b>Caso 3 — Bradicardia Instável</b></button>
+    <button class="btn" style="text-align:left;padding:16px;border-color:var(--yellow)" onclick="startMega(3)"><b>Caso 4 — Taquicardia Instável</b></button>
+  </div>
+  <div id="megaGame" style="display:none"></div>
+</div>
+
+<div class="section" id="pharma">
+  <h2>Farmacologia SAVC</h2>
+  <div class="table-scroll">
+  <table class="pharma-table">
+    <thead><tr><th>Medicamento</th><th>Dose / Via</th><th>Indicação</th></tr></thead>
+    <tbody>
+      <tr><td><div class="drug-name">Epinefrina</div></td><td>1mg IV/IO a cada 3–5min</td><td><span class="indication-tag" style="background:rgba(232,67,58,0.2);color:var(--accent)">PCR</span></td></tr>
+      <tr><td><div class="drug-name">Amiodarona</div></td><td>PCR: 300mg bolus (2ª: 150mg)</td><td><span class="indication-tag" style="background:rgba(232,67,58,0.2);color:var(--accent)">FV/TVSP refratária</span></td></tr>
+      <tr><td><div class="drug-name">Atropina</div></td><td>1mg IV a cada 3–5min (máx 3mg)</td><td><span class="indication-tag" style="background:rgba(56,189,248,0.2);color:var(--blue)">Bradicardia sintomática</span></td></tr>
+      <tr><td><div class="drug-name">Adenosina</div></td><td>6mg IV rápido + flush (2ª: 12mg)</td><td><span class="indication-tag" style="background:rgba(251,191,36,0.2);color:var(--yellow)">TSV instável</span></td></tr>
+      <tr><td><div class="drug-name">Alteplase</div></td><td>0,9 mg/kg IV (máx 90mg)</td><td><span class="indication-tag" style="background:rgba(74,222,128,0.2);color:var(--green)">AVC isquêmico</span></td></tr>
+    </tbody>
+  </table>
+  </div>
+</div>
+
+<div class="section" id="times">
+  <h2>Tempos-Alvo Críticos</h2>
+  <div class="table-scroll">
+  <table class="times-table">
+    <thead><tr><th>Meta</th><th>Tempo</th><th>Contexto</th></tr></thead>
+    <tbody>
+      <tr><td>Porta → ECG</td><td class="time-val">≤10 min</td><td>SCA</td></tr>
+      <tr><td>Porta → balão (ICP)</td><td class="time-val">≤90 min</td><td>SCA</td></tr>
+      <tr><td>Porta → agulha (fibrinolítico)</td><td class="time-val">≤30 min</td><td>SCA</td></tr>
+      <tr><td>Avaliação médica + TC crânio</td><td class="time-val">≤20 min</td><td>AVC</td></tr>
+      <tr><td>Porta → agulha (Alteplase)</td><td class="time-val">≤60 min (meta 45)</td><td>AVC</td></tr>
+    </tbody>
+  </table>
+  </div>
+</div>
+
+<div class="section" id="hsts">
+  <h2>Hs & Ts</h2>
+  <div class="hs-ts-grid">
+    <div class="hs-box">
+      <div style="font-size:0.75rem; font-family:'Space Mono',monospace; margin-bottom:14px;">// 5 Hs</div>
+      <div class="hs-ts-item"><div class="hs-ts-letter" style="color:var(--blue)">H</div><div><strong>Hipovolemia</strong></div></div>
+      <div class="hs-ts-item"><div class="hs-ts-letter" style="color:var(--blue)">H</div><div><strong>Hipóxia</strong></div></div>
+      <div class="hs-ts-item"><div class="hs-ts-letter" style="color:var(--blue)">H</div><div><strong>H⁺ (Acidemia)</strong></div></div>
+      <div class="hs-ts-item"><div class="hs-ts-letter" style="color:var(--blue)">H</div><div><strong>Hipo/Hipercalemia</strong></div></div>
+      <div class="hs-ts-item"><div class="hs-ts-letter" style="color:var(--blue)">H</div><div><strong>Hipotermia</strong></div></div>
+    </div>
+    <div class="ts-box">
+      <div style="font-size:0.75rem; font-family:'Space Mono',monospace; margin-bottom:14px;">// 5 Ts</div>
+      <div class="hs-ts-item"><div class="hs-ts-letter" style="color:var(--accent)">T</div><div><strong>Tensão (Pneumotórax)</strong></div></div>
+      <div class="hs-ts-item"><div class="hs-ts-letter" style="color:var(--accent)">T</div><div><strong>Tamponamento</strong></div></div>
+      <div class="hs-ts-item"><div class="hs-ts-letter" style="color:var(--accent)">T</div><div><strong>Toxinas</strong></div></div>
+      <div class="hs-ts-item"><div class="hs-ts-letter" style="color:var(--accent)">T</div><div><strong>TEP (Trombose pulmonar)</strong></div></div>
+      <div class="hs-ts-item"><div class="hs-ts-letter" style="color:var(--accent)">T</div><div><strong>Trombose coronária</strong></div></div>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<script>
+/* ============ NAV ============ */
+function showSection(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  const btn = document.querySelector(`button[onclick*="'${id}'"]`);
+  if(btn) btn.classList.add('active');
+  
+  if(id === 'flashcards' && !currentDeck.length) loadDeck('all');
+  if(id === 'quiz' && !quizActive) startQuiz();
+  if(id === 'atlas') renderAtlas();
+}
+
+/* ============ ALGORITHMS ============ */
+const algos = {
+  pcr: { title: 'PCR — FV / TVSP', color: 'var(--accent)', steps: [{num:'1', title:'Reconhecer PCR', content:'Sem resposta + sem pulso. Iniciar RCP alta qualidade.'},{num:'2', title:'RCP Alta Qualidade', content:'100–120/min, profundidade ≥5cm, retorno do tórax.'},{num:'3', title:'Desfibrilar (FV/TVSP)', content:'Choque imediato → Reiniciar RCP.'},{num:'4', title:'Acesso + Epinefrina', content:'1mg IV/IO a cada 3–5 min (após 2º choque).'},{num:'5', title:'Amiodarona', content:'300mg IV/IO após 3º choque (2ª dose: 150mg).'}] },
+  aesp: { title: 'PCR — AESP / Assístole', color: 'var(--blue)', steps: [{num:'1', title:'Reconhecer', content:'Atividade sem pulso ou linha reta (assístole).'},{num:'2', title:'RCP + Epinefrina', content:'1mg IV o mais rápido possível e a cada 3-5min.'},{num:'3', title:'Buscar Hs e Ts', content:'Tratar a causa reversível é a prioridade.'}] },
+  sca: { title: 'Síndromes Coronárias (SCA)', color: 'var(--accent2)', steps: [{num:'1', title:'SME', content:'Aspirina 162-325mg, O2, Nitrato, ECG 12 derivações.'},{num:'2', title:'Avaliação DE', content:'Porta-ECG ≤10min.'},{num:'3', title:'IAMST', content:'ICP porta-balão ≤90min ou Fibrinolítico ≤30min.'}] },
+  avc: { title: 'Acidente Vascular Cerebral', color: 'var(--green)', steps: [{num:'1', title:'CPSS', content:'Face, Braço, Fala.'},{num:'2', title:'Avaliação DE', content:'TC Crânio em ≤20min, laudo ≤45min.'},{num:'3', title:'Alteplase', content:'0,9 mg/kg (máx 90mg) se janela ≤3h (ou 4,5h). PA deve ser ≤185/110.'}] },
+  brady: { title: 'Bradicardia Sintomática', color: 'var(--blue)', steps: [{num:'1', title:'Identificar', content:'FC <50/min + Instabilidade (hipotensão, alteração mental).'},{num:'2', title:'Atropina', content:'1mg IV (máx 3mg). Não usar em BAV 3º grau ou Mobitz II.'},{num:'3', title:'Se refratário', content:'MPTC ou Dopamina 5-20 mcg/kg/min ou Epinefrina.'}] },
+  taqui: { title: 'Taquicardia', color: 'var(--yellow)', steps: [{num:'1', title:'Instável', content:'Cardioversão Sincronizada Imediata.'},{num:'2', title:'Estável (QRS Estreito)', content:'Manobras vagais → Adenosina 6mg.'},{num:'3', title:'Estável (QRS Largo)', content:'Amiodarona 150mg IV em 10min.'}] },
+  pospcr: { title: 'Cuidados Pós-PCR', color: 'var(--green)', steps: [{num:'1', title:'Hemodinâmica', content:'PAS ≥90 mmHg, SpO2 92-98%.'},{num:'2', title:'CDT', content:'Controle de Temperatura 32-36°C se inconsciente.'}] }
+};
+function showAlgo(key, btn) {
+  document.querySelectorAll('[data-algo]').forEach(b => b.classList.remove('primary'));
+  if(btn) btn.classList.add('primary');
+  const a = algos[key];
+  let html = `<div class="algo-box"><h3 style="font-size:1.1rem; color:${a.color}; margin-bottom:24px;">${a.title}</h3>`;
+  a.steps.forEach(s => { html += `<div class="algo-step"><div class="step-num">${s.num}</div><div class="step-content"><h4>${s.title}</h4><p>${s.content}</p></div></div>`; });
+  document.getElementById('algoContent').innerHTML = html + '</div>';
+}
+setTimeout(() => showAlgo('pcr', document.querySelector('[data-algo=pcr]')), 100);
+
+/* ============ RITMOS & SVG ============ */
+const rhythms = [
+  {id:'sinus',name:'Sinusal Normal',cat:'normal',hr:'60–100',conduct:'Nenhuma intervenção.',crit:{'Onda P':'Presente, antes de cada QRS',QRS:'Estreito'}},
+  {id:'fv',name:'FV (Fibrilação Ventricular)',cat:'chocavel',hr:'caótica',conduct:'Desfibrilação Imediata + RCP.',crit:{'Onda P':'Ausente',QRS:'Ondulações irregulares'}},
+  {id:'tv',name:'TV Monomórfica',cat:'chocavel',hr:'150–250',conduct:'Sem pulso: Choque. Instável com pulso: Cardioversão.',crit:{'Onda P':'Ausente',QRS:'Largo uniforme'}},
+  {id:'asystole',name:'Assístole',cat:'naochocavel',hr:'0',conduct:'RCP + Epinefrina 1mg.',crit:{'Ritmo':'Linha reta'}},
+  {id:'bav3',name:'BAV 3º Grau',cat:'brady',hr:'30–45',conduct:'Emergência. MPTC Imediato.',crit:{'P e QRS':'Dissociados'}},
+  {id:'tsv',name:'Taquicardia Supraventricular',cat:'taqui',hr:'150–250',conduct:'Adenosina (se estável) ou Cardioversão.',crit:{'QRS':'Estreito regular'}}
+];
+function rhythmPath(type){
+  let d='M0,70'; let x=0; const lineTo=(nx,ny)=>{d+=` L${nx.toFixed(1)},${ny.toFixed(1)}`;};
+  function pBeat(cw){
+    lineTo(x+cw*0.05,70); lineTo(x+cw*0.09,62); lineTo(x+cw*0.13,70); // P
+    lineTo(x+cw*0.18,70); lineTo(x+cw*0.20,76); lineTo(x+cw*0.23,28); lineTo(x+cw*0.26,80); lineTo(x+cw*0.29,70); // QRS
+    lineTo(x+cw*0.4,70); lineTo(x+cw*0.45,58); lineTo(x+cw*0.5,70); // T
+    x+=cw; lineTo(x,70);
+  }
+  if(type==='sinus'){ for(let i=0;i<6;i++)pBeat(100); }
+  else if(type==='fv'){ while(x<600){x+=8+Math.random()*8; lineTo(x,70+(Math.random()*50-25));} }
+  else if(type==='tv'){ while(x<600){lineTo(x+12,30);lineTo(x+24,110);lineTo(x+36,70);x+=48;} }
+  else if(type==='asystole'){ d='M0,71 L40,71 L42,69 L600,70.5'; }
+  else if(type==='bav3'){ while(x<600){lineTo(x+10,70);lineTo(x+15,62);lineTo(x+20,70); if(x%140<60){lineTo(x+30,76);lineTo(x+42,34);lineTo(x+54,80);lineTo(x+64,70);} x+=70; } }
+  else if(type==='tsv'){ for(let i=0;i<14;i++){ lineTo(x+10,70); lineTo(x+12,76); lineTo(x+15,28); lineTo(x+18,80); lineTo(x+21,70); lineTo(x+30,70); lineTo(x+35,64); lineTo(x+40,70); x+=42; } }
+  else { for(let i=0;i<6;i++)pBeat(100); }
+  return d;
+}
+
+let atlasIdx=0;
+function renderAtlas(){
+  document.getElementById('rhythmPager').innerHTML = rhythms.map((r,i)=>`<button class="rhythm-chip ${i===atlasIdx?'active':''}" onclick="atlasIdx=${i};renderAtlas()">${r.name}</button>`).join('');
+  const r=rhythms[atlasIdx];
+  const danger=['fv','tv','asystole'].includes(r.id);
+  document.getElementById('atlasSvg').innerHTML=`<path class="ecg-trace ${danger?'danger':''}" d="${rhythmPath(r.id)}"/>`;
+  document.getElementById('atlasHR').textContent=r.hr;
+  document.getElementById('atlasMeta').innerHTML=`<div class="rhythm-name">${r.name}</div><div class="conduct"><b>Conduta:</b> ${r.conduct}</div><div class="crit-grid">${Object.entries(r.crit).map(([k,v])=>`<div class="crit"><div class="crit-label">${k}</div><div class="crit-val">${v}</div></div>`).join('')}</div>`;
+}
+
+/* ============ TREINO VISUAL ============ */
+let trainCurrent=null,trainHits=0,trainTries=0;
+function nextTrain(){
+  trainCurrent=rhythms[Math.floor(Math.random()*rhythms.length)];
+  document.getElementById('trainSvg').innerHTML=`<path class="ecg-trace ${['fv','tv','asystole'].includes(trainCurrent.id)?'danger':''}" d="${rhythmPath(trainCurrent.id)}"/>`;
+  document.getElementById('trainHR').textContent=trainCurrent.hr;
+  const opts=[trainCurrent, ...rhythms.filter(x=>x.id!==trainCurrent.id).slice(0,3)].sort(()=>Math.random()-0.5);
+  document.getElementById('trainOpts').innerHTML=opts.map(o=>`<button class="train-opt" onclick="answerTrain('${o.id}')">${o.name}</button>`).join('');
+  document.getElementById('trainFeedback').className='train-feedback';
+  document.getElementById('trainNext').style.display='none';
+}
+function answerTrain(id){
+  trainTries++; const correct = (id===trainCurrent.id); if(correct) trainHits++;
+  document.querySelectorAll('.train-opt').forEach(b=>{ b.classList.add('locked'); if(b.textContent===trainCurrent.name) b.classList.add('correct'); else if(b.textContent===rhythms.find(r=>r.id===id).name) b.classList.add('incorrect'); });
+  document.getElementById('trainFeedback').className='train-feedback show '+(correct?'right':'wrong');
+  document.getElementById('trainFeedback').innerHTML=`<b>${correct?'✓ Correto!':'✗ Era '+trainCurrent.name}</b><br>Conduta: ${trainCurrent.conduct}`;
+  document.getElementById('trainNext').style.display='';
+  document.getElementById('trainScore').textContent=`${trainHits} acertos · ${trainTries} tentativas`;
+}
+
+/* ============ RECALL ============ */
+const recalls = [
+  {q:'Componentes da RCP de alta qualidade?', a:'Frequência 100-120/min; Profundidade ≥5cm; Retorno total; FCT máxima (pausas ≤10s).'},
+  {q:'Sequência de medicamentos na FV refratária?', a:'Epinefrina 1mg IV a cada 3-5min (após 2º choque). Amiodarona 300mg (após 3º choque).'},
+  {q:'Os 5 Hs e 5 Ts?', a:'HipoVAHO (Volemia, Ar/O2, H+, O/Calemia, Hipotermia). Ts: Tensão, Tamponamento, Toxinas, TEP, Trombose Coronária.'}
+];
+let recallIdx=0;
+function renderRecall(){
+  document.getElementById('recallQ').textContent = recalls[recallIdx].q;
+  document.getElementById('recallInput').value = '';
+  document.getElementById('modelAnswer').classList.remove('show');
+}
+function revealModel(){
+  document.getElementById('modelAnswer').classList.add('show');
+  document.getElementById('modelText').textContent = recalls[recallIdx].a;
+}
+function nextRecall(){ recallIdx=(recallIdx+1)%recalls.length; renderRecall(); }
+
+/* ============ FLASHCARDS ============ */
+const flashcards = [
+  {deck:'pcr', q:'Dose Epinefrina PCR?', a:'1mg IV/IO a cada 3-5 minutos.'},
+  {deck:'pcr', q:'Ritmos Chocáveis?', a:'FV e TV Sem Pulso.'},
+  {deck:'brady', q:'1ª Linha para Bradicardia?', a:'Atropina 1mg IV.'},
+  {deck:'taqui', q:'Tratamento TSV Estável?', a:'Manobras vagais -> Adenosina 6mg.'}
+];
+let currentDeck=[], fIdx=0;
+function loadDeck(type){
+  document.querySelectorAll('#deckButtons .btn').forEach(b=>b.classList.remove('primary'));
+  event?.target?.classList.add('primary');
+  currentDeck = type==='all' ? [...flashcards] : flashcards.filter(c=>c.deck===type);
+  fIdx=0; showCard();
+}
+function showCard(){
+  document.getElementById('flashcard').classList.remove('flipped');
+  document.getElementById('cardQuestion').textContent = currentDeck[fIdx].q;
+  document.getElementById('cardAnswer').textContent = currentDeck[fIdx].a;
+}
+function flipCard(){ document.getElementById('flashcard').classList.toggle('flipped'); }
+function nextCard(){ fIdx=(fIdx+1)%currentDeck.length; showCard(); }
+function prevCard(){ fIdx=(fIdx-1+currentDeck.length)%currentDeck.length; showCard(); }
+function shuffleDeck(){ currentDeck.sort(()=>Math.random()-0.5); fIdx=0; showCard(); }
+
+/* ============ QUIZ ============ */
+const quizQs = [
+  {q:'Frequência correta na RCP?', opts:['80-100','100-120','120-140'], ans:1},
+  {q:'Medicamento após 3º choque na FV?', opts:['Atropina','Adenosina','Amiodarona'], ans:2},
+  {q:'Tratamento TV Polimórfica?', opts:['Choque sincronizado','Choque NÃO sincronizado','Nenhuma das alternativas'], ans:1}
+];
+let qIdx=0, qScore=0, quizActive=false;
+function startQuiz(){ qIdx=0; qScore=0; quizActive=true; renderQuiz(); }
+function renderQuiz(){
+  if(qIdx>=quizQs.length) {
+    document.getElementById('quizContent').innerHTML = `<div class="quiz-score"><div class="score-num">${Math.round(qScore/quizQs.length*100)}%</div><button class="btn primary" onclick="startQuiz()">Refazer</button></div>`;
+    return;
+  }
+  const q = quizQs[qIdx];
+  let html = `<div class="algo-box"><div style="margin-bottom:12px;font-weight:700">${q.q}</div>`;
+  q.opts.forEach((o,i)=> html+=`<button class="btn" style="display:block;width:100%;text-align:left;margin-bottom:8px" onclick="answerQ(${i})">${o}</button>`);
+  document.getElementById('quizContent').innerHTML = html + `</div>`;
+}
+function answerQ(i){ if(i===quizQs[qIdx].ans) qScore++; qIdx++; renderQuiz(); }
+
+/* ============ MEGACODE ============ */
+const megacases = [
+  {steps:[{narrative:'Homem 58a colapso súbito. Sem pulso. Monitor: FV.', prompt:'Conduta imediata?', opts:[{t:'Desfibrilar imediatamente',ok:true},{t:'Epinefrina',ok:false}],exp:'FV é ritmo CHOCÁVEL. Choque imediato + RCP.'}]}
+];
+let megaCase=0, megaStep=0;
+function startMega(idx){ megaCase=0; megaStep=0; document.getElementById('megaSelect').style.display='none'; document.getElementById('megaGame').style.display=''; renderMega(); }
+function renderMega(){
+  if(megaStep >= megacases[megaCase].steps.length) {
+    document.getElementById('megaGame').innerHTML=`<div class="mega-scene" style="text-align:center"><h3>Caso Concluído!</h3><br><button class="btn" onclick="document.getElementById('megaGame').style.display='none';document.getElementById('megaSelect').style.display='';">Voltar</button></div>`;
+    return;
+  }
+  const s = megacases[megaCase].steps[megaStep];
+  document.getElementById('megaGame').innerHTML = `<div class="mega-scene"><div class="mega-narrative">${s.narrative}</div><div class="mega-prompt">${s.prompt}</div><div class="mega-opts">${s.opts.map((o,i)=>`<button class="mega-opt" onclick="ansMega(${i}, ${o.ok})">${o.t}</button>`).join('')}</div><div class="mega-exp" id="megaExp">💡 ${s.exp}</div><br><button class="btn primary" id="megaNext" style="display:none" onclick="megaStep++;renderMega()">Próximo</button></div>`;
+}
+function ansMega(i, ok){
+  document.querySelectorAll('.mega-opt').forEach((b,idx)=> { b.classList.add('locked'); if(idx===i) b.classList.add(ok?'correct':'wrong'); });
+  document.getElementById('megaExp').classList.add('show'); document.getElementById('megaNext').style.display='';
+}
+
+/* INIT */
+renderAtlas(); nextTrain(); renderRecall();
+</script>
+</body>
+</html>
