@@ -1,0 +1,12 @@
+{
+  "name": "savc-super-app",
+  "version": "1.0.0",
+  "description": "SAVC Super App — Estudo Completo ACLS/AHA",
+  "dependencies": {
+    "@capacitor/android": "^6.0.0",
+    "@capacitor/core": "^6.0.0"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^6.0.0"
+  }
+}

@@ -1,0 +1,1470 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SAVC — Super App Completo</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Space+Mono:wght@400;700&display=swap');
+:root{
+  --bg:#070a0f;--surface:#0f1219;--surface2:#161b25;--border:#1d2433;
+  --accent:#e8433a;--accent2:#ff8c42;--accent3:#4ade80;--accent4:#38bdf8;
+  --yellow:#fbbf24;--purple:#a78bfa;--text:#e8eaf0;--text2:#878fa6;--text3:#4a5168;
+  --grid:#1a2430;--ecg:#4ade80;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+header{padding:18px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;background:rgba(7,10,15,0.97);backdrop-filter:blur(10px)}
+.logo{font-size:1.05rem;font-weight:800;letter-spacing:-0.02em}
+.logo span{color:var(--accent)}
+.progress-wrap{text-align:right}
+.progress-bar{width:160px;height:4px;background:var(--border);border-radius:2px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:2px;transition:width .4s;width:0%}
+.progress-label{font-family:'Space Mono',monospace;font-size:0.62rem;color:var(--text2);margin-top:3px}
+nav{display:flex;gap:2px;padding:14px 24px;border-bottom:1px solid var(--border);overflow-x:auto;scrollbar-width:none}
+nav::-webkit-scrollbar{display:none}
+.nav-btn{font-family:'Space Mono',monospace;font-size:0.66rem;padding:7px 13px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text2);cursor:pointer;white-space:nowrap;transition:all .2s;letter-spacing:.03em}
+.nav-btn:hover{border-color:var(--accent);color:var(--text)}
+.nav-btn.active{background:var(--accent);border-color:var(--accent);color:#fff}
+main{padding:24px;max-width:920px;margin:0 auto}
+.section{display:none;animation:fade .3s ease}
+.section.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+h2{font-size:1.45rem;font-weight:800;margin-bottom:6px}
+.subtitle{color:var(--text2);font-family:'Space Mono',monospace;font-size:.73rem;margin-bottom:26px}
+.btn{font-family:'Space Mono',monospace;font-size:.72rem;padding:9px 18px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);cursor:pointer;transition:all .2s;letter-spacing:.02em}
+.btn:hover{border-color:var(--accent);background:rgba(232,67,58,.08)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.primary:hover{background:#d43830}
+.btn.green{background:rgba(74,222,128,.12);border-color:var(--accent3);color:var(--accent3)}
+.btn.blue{background:rgba(56,189,248,.12);border-color:var(--accent4);color:var(--accent4)}
+.btn.success{background:rgba(74,222,128,.1);border-color:var(--accent3);color:var(--accent3)}
+.btn.fail{background:rgba(232,67,58,.1);border-color:var(--accent);color:var(--accent)}
+.sep{height:1px;background:var(--border);margin:26px 0}
+/* CARDS GRID */
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin-bottom:24px}
+.topic-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
+.topic-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,transparent 60%,rgba(232,67,58,.06));pointer-events:none}
+.topic-card:hover{border-color:var(--accent);transform:translateY(-2px)}
+.topic-card .tag{font-family:'Space Mono',monospace;font-size:.6rem;color:var(--accent);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
+.topic-card h3{font-size:.95rem;font-weight:700;line-height:1.3}
+.topic-card .count{font-family:'Space Mono',monospace;font-size:.7rem;color:var(--text3);margin-top:8px}
+/* OVERVIEW */
+.overview-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px}
+.overview-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px;transition:all .2s}
+.overview-card:hover{border-color:rgba(232,67,58,.4)}
+.overview-card h3{font-size:.95rem;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.overview-card ul{font-size:.84rem;color:var(--text2);padding-left:14px;line-height:1.7}
+.ov-badge{font-size:.7rem;padding:2px 8px;border-radius:4px;font-family:'Space Mono',monospace}
+.badge-red{background:rgba(232,67,58,.2);color:var(--accent)}
+.badge-blue{background:rgba(56,189,248,.2);color:var(--accent4)}
+.badge-green{background:rgba(74,222,128,.2);color:var(--accent3)}
+.badge-yellow{background:rgba(251,191,36,.2);color:var(--yellow)}
+.badge-orange{background:rgba(255,140,66,.2);color:var(--accent2)}
+.badge-purple{background:rgba(167,139,250,.2);color:var(--purple)}
+/* ALGO */
+.algo-box{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px;margin-bottom:20px}
+.algo-step{display:flex;gap:16px;margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--border)}
+.algo-step:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.step-num{width:32px;height:32px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:.75rem;font-weight:700;flex-shrink:0;margin-top:2px}
+.step-num.blue{background:var(--accent4)}
+.step-num.green{background:var(--accent3);color:#000}
+.step-num.yellow{background:var(--yellow);color:#000}
+.step-num.purple{background:var(--purple);color:#000}
+.step-content h4{font-weight:700;font-size:.95rem;margin-bottom:4px}
+.step-content p,.step-content ul{font-size:.88rem;color:var(--text2);line-height:1.6}
+.step-content ul{padding-left:16px;margin-top:4px}
+.step-content li{margin-bottom:3px}
+.highlight{color:var(--accent);font-weight:700}
+.highlight.blue{color:var(--accent4)}
+.highlight.green{color:var(--accent3)}
+.highlight.yellow{color:var(--yellow)}
+.decision-box{background:rgba(232,67,58,.08);border:1px solid rgba(232,67,58,.3);border-radius:10px;padding:14px 16px;margin:12px 0;font-size:.88rem}
+.decision-box.blue{background:rgba(56,189,248,.08);border-color:rgba(56,189,248,.3)}
+.decision-box.green{background:rgba(74,222,128,.08);border-color:rgba(74,222,128,.3)}
+.alert-box{background:rgba(232,67,58,.08);border:1px solid rgba(232,67,58,.3);border-radius:10px;padding:14px 16px;font-size:.86rem;line-height:1.6;margin:12px 0}
+.alert-box.blue{background:rgba(56,189,248,.08);border-color:rgba(56,189,248,.3)}
+.alert-box.green{background:rgba(74,222,128,.08);border-color:rgba(74,222,128,.3)}
+.alert-box.yellow{background:rgba(251,191,36,.08);border-color:rgba(251,191,36,.3)}
+.alert-box.purple{background:rgba(167,139,250,.08);border-color:rgba(167,139,250,.3)}
+/* ECG MONITOR */
+.monitor{background:#04080a;border:1px solid var(--border);border-radius:14px;overflow:hidden;position:relative;box-shadow:inset 0 0 60px rgba(74,222,128,.04)}
+.monitor-head{display:flex;justify-content:space-between;align-items:center;padding:12px 18px;border-bottom:1px solid rgba(74,222,128,.1);background:rgba(74,222,128,.02)}
+.monitor-lead{font-family:'Space Mono',monospace;font-size:.7rem;color:var(--accent3);letter-spacing:.1em}
+.monitor-hr{font-family:'Space Mono',monospace;font-size:.95rem;color:var(--accent3);font-weight:700}
+.monitor-hr span{font-size:.62rem;color:var(--text2)}
+.ecg-svg{width:100%;display:block;background:repeating-linear-gradient(0deg,transparent,transparent 19px,var(--grid) 19px,var(--grid) 20px),repeating-linear-gradient(90deg,transparent,transparent 19px,var(--grid) 19px,var(--grid) 20px)}
+.ecg-trace{fill:none;stroke:var(--ecg);stroke-width:2;stroke-linejoin:round;stroke-linecap:round;filter:drop-shadow(0 0 3px rgba(74,222,128,.5))}
+.ecg-trace.danger{stroke:var(--accent);filter:drop-shadow(0 0 3px rgba(232,67,58,.5))}
+/* RHYTHM CARD */
+.rhythm-meta{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px;margin-top:16px}
+.rhythm-name{font-size:1.2rem;font-weight:800;margin-bottom:4px}
+.rhythm-cat{display:inline-block;font-family:'Space Mono',monospace;font-size:.62rem;padding:3px 9px;border-radius:5px;margin-bottom:14px;letter-spacing:.06em}
+.cat-normal{background:rgba(74,222,128,.15);color:var(--accent3)}
+.cat-chocavel{background:rgba(232,67,58,.18);color:var(--accent)}
+.cat-naochocavel{background:rgba(167,139,250,.18);color:var(--purple)}
+.cat-brady{background:rgba(56,189,248,.18);color:var(--accent4)}
+.cat-taqui{background:rgba(251,191,36,.18);color:var(--yellow)}
+.crit-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin:16px 0}
+.crit{background:var(--surface2);border-radius:8px;padding:10px 12px}
+.crit-label{font-family:'Space Mono',monospace;font-size:.58rem;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px}
+.crit-val{font-size:.82rem;font-weight:600;line-height:1.3}
+.theory-block{margin-top:16px}
+.theory-block h4{font-size:.78rem;font-family:'Space Mono',monospace;color:var(--accent2);letter-spacing:.05em;margin-bottom:8px;text-transform:uppercase}
+.theory-block p,.theory-block ul{font-size:.88rem;line-height:1.65;color:var(--text)}
+.theory-block ul{padding-left:18px}
+.theory-block li{margin-bottom:5px;color:var(--text2)}
+.conduct{background:rgba(74,222,128,.06);border-left:3px solid var(--accent3);border-radius:8px;padding:12px 14px;margin-top:8px;font-size:.86rem;line-height:1.6}
+.pitfall{background:rgba(232,67,58,.06);border-left:3px solid var(--accent);border-radius:8px;padding:12px 14px;margin-top:10px;font-size:.86rem;line-height:1.6}
+.rhythm-pager{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px}
+.rhythm-chip{font-family:'Space Mono',monospace;font-size:.63rem;padding:6px 10px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text2);cursor:pointer;transition:all .2s}
+.rhythm-chip:hover{border-color:var(--accent3);color:var(--text)}
+.rhythm-chip.active{background:var(--accent3);border-color:var(--accent3);color:#000;font-weight:700}
+/* TRAIN */
+.train-opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:16px}
+.train-opt{padding:12px 14px;border-radius:9px;border:1px solid var(--border);background:var(--surface2);cursor:pointer;font-size:.82rem;transition:all .2s;text-align:left;font-weight:600}
+.train-opt:hover:not(.locked){border-color:var(--accent3);background:rgba(74,222,128,.06)}
+.train-opt.correct{border-color:var(--accent3);background:rgba(74,222,128,.14);color:var(--accent3)}
+.train-opt.incorrect{border-color:var(--accent);background:rgba(232,67,58,.12);color:var(--accent)}
+.train-opt.locked{cursor:default}
+.train-feedback{margin-top:16px;padding:16px;border-radius:10px;display:none}
+.train-feedback.show{display:block}
+.train-feedback.right{background:rgba(74,222,128,.1);border:1px solid var(--accent3)}
+.train-feedback.wrong{background:rgba(232,67,58,.1);border:1px solid var(--accent)}
+.score-pill{font-family:'Space Mono',monospace;font-size:.7rem;color:var(--text2);text-align:center;margin-top:14px}
+/* RECALL */
+.recall-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:24px;margin-bottom:16px}
+.recall-q{font-size:1.05rem;font-weight:600;line-height:1.6;margin-bottom:18px}
+.recall-tag{display:inline-block;font-family:'Space Mono',monospace;font-size:.6rem;padding:3px 8px;border-radius:4px;background:rgba(232,67,58,.15);color:var(--accent);margin-bottom:12px;letter-spacing:.05em}
+.recall-input{width:100%;min-height:120px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px;color:var(--text);font-family:'Syne',sans-serif;font-size:.92rem;line-height:1.6;resize:vertical}
+.recall-input:focus{outline:none;border-color:var(--accent4)}
+.recall-input::placeholder{color:var(--text3)}
+.model-answer{margin-top:16px;padding:16px;border-radius:10px;background:var(--surface2);border-left:3px solid var(--accent3);display:none}
+.model-answer.show{display:block}
+.model-answer h5{font-family:'Space Mono',monospace;font-size:.65rem;color:var(--accent3);letter-spacing:.06em;margin-bottom:8px;text-transform:uppercase}
+.model-answer p{font-size:.9rem;line-height:1.7;color:var(--text)}
+.keypoints{margin-top:12px}
+.keypoint{display:flex;gap:8px;align-items:flex-start;margin-bottom:6px;font-size:.83rem;color:var(--text2)}
+.keypoint::before{content:'▸';color:var(--accent3);flex-shrink:0}
+.self-rate{display:none;gap:8px;margin-top:16px;flex-wrap:wrap}
+.self-rate.show{display:flex}
+/* MEGACODE */
+.mega-scene{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:24px;margin-bottom:16px}
+.mega-vitals{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.vital{font-family:'Space Mono',monospace;font-size:.68rem;padding:5px 10px;border-radius:6px;background:var(--surface2);border:1px solid var(--border)}
+.vital b{color:var(--accent3)}
+.vital.bad b{color:var(--accent)}
+.vital.warn b{color:var(--yellow)}
+.mega-narrative{font-size:.95rem;line-height:1.65;margin-bottom:8px}
+.mega-prompt{font-weight:700;font-size:.95rem;margin:16px 0 12px;color:var(--accent2)}
+.mega-opts{display:flex;flex-direction:column;gap:9px}
+.mega-opt{padding:13px 16px;border-radius:9px;border:1px solid var(--border);background:var(--surface2);cursor:pointer;font-size:.88rem;line-height:1.5;transition:all .2s;text-align:left}
+.mega-opt:hover:not(.locked){border-color:var(--accent4);background:rgba(56,189,248,.06)}
+.mega-opt.correct{border-color:var(--accent3);background:rgba(74,222,128,.12);color:var(--accent3)}
+.mega-opt.wrong{border-color:var(--accent);background:rgba(232,67,58,.12);color:var(--accent)}
+.mega-opt.locked{cursor:default}
+.mega-exp{margin-top:14px;padding:14px;border-radius:10px;background:var(--surface2);border-left:3px solid var(--accent4);font-size:.85rem;line-height:1.6;color:var(--text2);display:none}
+.mega-exp.show{display:block}
+.mega-progress{display:flex;gap:4px;margin-bottom:18px}
+.mega-dot{flex:1;height:4px;border-radius:2px;background:var(--border)}
+.mega-dot.done{background:var(--accent3)}
+.mega-dot.current{background:var(--accent)}
+.mega-result{text-align:center;padding:36px 20px}
+.mega-score{font-size:3.5rem;font-weight:800;line-height:1}
+/* FLASHCARD */
+.flashcard-container{perspective:1000px;margin:0 auto 24px;max-width:640px}
+.flashcard{width:100%;min-height:280px;position:relative;transform-style:preserve-3d;transition:transform .5s ease;cursor:pointer}
+.flashcard.flipped{transform:rotateY(180deg)}
+.card-face{position:absolute;width:100%;min-height:280px;backface-visibility:hidden;border-radius:16px;padding:32px;display:flex;flex-direction:column;justify-content:center;border:1px solid var(--border)}
+.card-front{background:var(--surface)}
+.card-back{background:var(--surface2);transform:rotateY(180deg);border-color:var(--accent)}
+.card-label{font-family:'Space Mono',monospace;font-size:.65rem;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:16px}
+.card-text{font-size:1.05rem;font-weight:600;line-height:1.6}
+.card-answer{font-size:.95rem;line-height:1.7;color:var(--text)}
+.card-hint{font-family:'Space Mono',monospace;font-size:.7rem;color:var(--text3);margin-top:16px}
+.card-tag{display:inline-block;font-size:.65rem;font-family:'Space Mono',monospace;padding:3px 8px;border-radius:4px;background:rgba(232,67,58,.15);color:var(--accent);margin-bottom:12px}
+.flashcard-nav{display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap}
+.card-counter{font-family:'Space Mono',monospace;font-size:.7rem;color:var(--text2);padding:9px 0}
+/* QUIZ */
+.quiz-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px;margin-bottom:20px}
+.quiz-q{font-size:1rem;font-weight:600;line-height:1.6;margin-bottom:20px}
+.quiz-options{display:flex;flex-direction:column;gap:10px}
+.quiz-opt{padding:13px 18px;border-radius:10px;border:1px solid var(--border);background:var(--surface2);cursor:pointer;font-size:.9rem;line-height:1.5;transition:all .2s;text-align:left}
+.quiz-opt:hover:not(.disabled){border-color:var(--accent4);background:rgba(56,189,248,.06)}
+.quiz-opt.correct{border-color:var(--accent3);background:rgba(74,222,128,.1);color:var(--accent3)}
+.quiz-opt.wrong{border-color:var(--accent);background:rgba(232,67,58,.1);color:var(--accent)}
+.quiz-opt.disabled{cursor:default}
+.explanation{margin-top:16px;padding:14px 16px;border-radius:10px;background:var(--surface2);border-left:3px solid var(--accent4);font-size:.86rem;line-height:1.6;color:var(--text2);display:none}
+.explanation.show{display:block}
+.quiz-score{text-align:center;padding:40px 24px}
+.score-num{font-size:4rem;font-weight:800;color:var(--accent3);line-height:1}
+.score-label{font-family:'Space Mono',monospace;font-size:.8rem;color:var(--text2);margin-top:8px}
+/* PHARMA */
+.pharma-table{width:100%;border-collapse:collapse;font-size:.82rem}
+.pharma-table th{background:var(--surface2);color:var(--text2);font-family:'Space Mono',monospace;font-size:.65rem;letter-spacing:.06em;text-transform:uppercase;padding:10px 14px;text-align:left;border-bottom:2px solid var(--border)}
+.pharma-table td{padding:11px 14px;border-bottom:1px solid var(--border);vertical-align:top;line-height:1.5}
+.pharma-table tr:hover td{background:rgba(255,255,255,.02)}
+.drug-name{font-weight:700;color:var(--accent2)}
+.dose{font-family:'Space Mono',monospace;color:var(--accent4);font-size:.8rem}
+.indication-tag{display:inline-block;font-size:.62rem;padding:2px 7px;border-radius:4px;margin:2px;font-family:'Space Mono',monospace}
+.ind-pcr{background:rgba(232,67,58,.2);color:var(--accent)}
+.ind-brady{background:rgba(56,189,248,.2);color:var(--accent4)}
+.ind-taqui{background:rgba(251,191,36,.2);color:var(--yellow)}
+.ind-sca{background:rgba(255,140,66,.2);color:var(--accent2)}
+.ind-avc{background:rgba(74,222,128,.2);color:var(--accent3)}
+.table-scroll{overflow-x:auto;margin:-4px;padding:4px}
+.table-scroll::-webkit-scrollbar{height:4px}
+.table-scroll::-webkit-scrollbar-track{background:var(--border);border-radius:2px}
+.table-scroll::-webkit-scrollbar-thumb{background:var(--text3);border-radius:2px}
+/* TIMES TABLE */
+.times-table{width:100%;border-collapse:collapse;font-size:.83rem}
+.times-table th{background:var(--surface2);padding:10px 14px;text-align:left;font-family:'Space Mono',monospace;font-size:.65rem;color:var(--text2);text-transform:uppercase;letter-spacing:.05em;border-bottom:2px solid var(--border)}
+.times-table td{padding:10px 14px;border-bottom:1px solid var(--border);vertical-align:top;line-height:1.5}
+.time-val{font-family:'Space Mono',monospace;color:var(--accent);font-weight:700}
+/* HS TS */
+.hs-ts-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.hs-box,.ts-box{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px}
+.hs-box{border-top:3px solid var(--accent4)}
+.ts-box{border-top:3px solid var(--accent)}
+.hs-ts-title{font-size:.75rem;font-family:'Space Mono',monospace;letter-spacing:.1em;color:var(--text2);margin-bottom:14px}
+.hs-ts-item{display:flex;gap:10px;margin-bottom:10px;align-items:flex-start}
+.hs-ts-letter{font-size:1.1rem;font-weight:800;width:22px;flex-shrink:0}
+.hs-ts-text{font-size:.88rem;line-height:1.5;color:var(--text)}
+.hs-ts-sub{font-size:.78rem;color:var(--text2)}
+/* CHAIN (sistemas) */
+.chain{display:flex;flex-direction:column;gap:8px;margin:16px 0}
+.chain-link{display:flex;align-items:flex-start;gap:14px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px}
+.chain-link:hover{border-color:rgba(232,67,58,.3)}
+.chain-num{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:.72rem;font-weight:700;flex-shrink:0;margin-top:1px}
+.chain-body h4{font-size:.88rem;font-weight:700;margin-bottom:2px}
+.chain-body p{font-size:.82rem;color:var(--text2);line-height:1.5}
+/* TWO COL */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.info-box{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px}
+.info-box h3{font-size:.9rem;font-weight:700;margin-bottom:12px}
+.info-box ul{font-size:.84rem;color:var(--text2);padding-left:16px;line-height:1.7}
+.info-box li{margin-bottom:4px}
+@media(max-width:600px){
+  main{padding:16px}
+  header,nav{padding-left:16px;padding-right:16px}
+  .hs-ts-grid,.two-col{grid-template-columns:1fr}
+  .chain-num{display:none}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">SAVC <span>///</span> Super App</div>
+  <div class="progress-wrap">
+    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="progress-label" id="progressLabel">0 / 0 cards</div>
+  </div>
+</header>
+
+<nav>
+  <button class="nav-btn active" onclick="showSection('overview')">Visão Geral</button>
+  <button class="nav-btn" onclick="showSection('sistemas')">Sistemas</button>
+  <button class="nav-btn" onclick="showSection('algorithms')">Algoritmos</button>
+  <button class="nav-btn" onclick="showSection('atlas')">Atlas ECG</button>
+  <button class="nav-btn" onclick="showSection('train')">Treino Visual</button>
+  <button class="nav-btn" onclick="showSection('recall')">Recall</button>
+  <button class="nav-btn" onclick="showSection('megacode')">Megacode</button>
+  <button class="nav-btn" onclick="showSection('flashcards')">Flashcards</button>
+  <button class="nav-btn" onclick="showSection('quiz')">Quiz</button>
+  <button class="nav-btn" onclick="showSection('pharma')">Farmacologia</button>
+  <button class="nav-btn" onclick="showSection('times')">Tempos</button>
+  <button class="nav-btn" onclick="showSection('hsts')">Hs &amp; Ts</button>
+  <button class="nav-btn" onclick="showSection('airways')">Via Aérea</button>
+  <button class="nav-btn" onclick="showSection('especiais')">Sit. Especiais</button>
+  <button class="nav-btn" onclick="showSection('equipes')">Equipes</button>
+</nav>
+
+<main>
+
+<!-- ===== VISÃO GERAL ===== -->
+<div class="section active" id="overview">
+  <h2>Mapa do SAVC</h2>
+  <p class="subtitle">// estrutura completa do curso — clique para acessar</p>
+  <div class="overview-grid">
+    <div class="overview-card" onclick="showSection('algorithms');setTimeout(()=>document.querySelector('[data-algo=pcr]').click(),80)">
+      <h3><span class="ov-badge badge-red">PCR</span> Parada Cardiorrespiratória</h3>
+      <ul><li>FV / TVSP → desfibrilação imediata</li><li>Assístole / AESP → causas reversíveis</li><li>RCP alta qualidade: 100–120/min, ≥5cm</li><li>Epinefrina + Amiodarona</li><li>Via aérea avançada + capnografia</li></ul>
+    </div>
+    <div class="overview-card" onclick="showSection('algorithms');setTimeout(()=>document.querySelector('[data-algo=sca]').click(),80)">
+      <h3><span class="ov-badge badge-orange">SCA</span> Síndromes Coronárias Agudas</h3>
+      <ul><li>IAMST → ICP ≤90 min porta-balão</li><li>Fibrinólise ≤30 min porta-agulha</li><li>Aspirina 162–325 mg mastigável</li><li>SCA-SSST: alto vs baixo/intermediário</li><li>4 Ds hospitalares</li></ul>
+    </div>
+    <div class="overview-card" onclick="showSection('algorithms');setTimeout(()=>document.querySelector('[data-algo=avc]').click(),80)">
+      <h3><span class="ov-badge badge-green">AVC</span> Acidente Vascular Cerebral</h3>
+      <ul><li>87% isquêmico / 13% hemorrágico</li><li>CPSS: face, braço, fala</li><li>Alteplase: ≤3h (ou ≤4,5h selecionados)</li><li>TEV: até 24h (DAWN)</li><li>8 Ds do AVC</li></ul>
+    </div>
+    <div class="overview-card" onclick="showSection('algorithms');setTimeout(()=>document.querySelector('[data-algo=brady]').click(),80)">
+      <h3><span class="ov-badge badge-blue">BRADY</span> Bradicardia</h3>
+      <ul><li>Instável: FC &lt;50/min + sintomas causados</li><li>Atropina 1mg IV (máx 3mg)</li><li>MPTC + dopamina / epinefrina</li><li>Mobitz II / BAV 3º: não confiar na atropina</li><li>Transvenosa se refratário</li></ul>
+    </div>
+    <div class="overview-card" onclick="showSection('algorithms');setTimeout(()=>document.querySelector('[data-algo=taqui]').click(),80)">
+      <h3><span class="ov-badge badge-yellow">TAQUI</span> Taquicardia</h3>
+      <ul><li>Instável → cardioversão sincronizada imediata</li><li>FC ≥150/min mais provável de causar instabilidade</li><li>TV polimórfica → choque NÃO sincronizado</li><li>TSV estável → vagal → adenosina</li><li>TV estável → amiodarona 150mg IV</li></ul>
+    </div>
+    <div class="overview-card" onclick="showSection('algorithms');setTimeout(()=>document.querySelector('[data-algo=pospcr]').click(),80)">
+      <h3><span class="ov-badge badge-red">PÓS-PCR</span> Cuidados Pós-Parada</h3>
+      <ul><li>CDT 32–36°C por 24h</li><li>SpO₂ 92–98%; evitar hiperóxia</li><li>ICP se IAMST pós-RCE</li><li>Neuroprognóstico ≥72h após CDT</li><li>Glicemia 144–180 mg/dL</li></ul>
+    </div>
+    <div class="overview-card" onclick="showSection('atlas')">
+      <h3><span class="ov-badge badge-green">ECG</span> Atlas de Ritmos</h3>
+      <ul><li>15 ritmos animados com traçado SVG</li><li>Critérios diagnósticos completos</li><li>Conduta SAVC por ritmo</li><li>Treino visual interativo</li><li>Recall escrito com autoavaliação</li></ul>
+    </div>
+    <div class="overview-card" onclick="showSection('especiais')">
+      <h3><span class="ov-badge badge-purple">ESPECIAIS</span> Situações Especiais</h3>
+      <ul><li>Hipotermia acidental</li><li>Overdose de opioides</li><li>RCPEC (circulação extracorpórea)</li><li>PCR na gestação</li><li>DAV (dispositivo de assistência ventricular)</li></ul>
+    </div>
+  </div>
+  <div class="sep"></div>
+  <h2 style="font-size:1.1rem;margin-bottom:16px">RCP de Alta Qualidade — Parâmetros</h2>
+  <div class="overview-grid">
+    <div class="overview-card"><h3>⚡ Compressões</h3><ul><li>Frequência: <strong>100–120/min</strong></li><li>Profundidade: <strong>≥5 cm</strong> (evitar >6 cm)</li><li>Retorno total do tórax</li><li>Trocar compressor ≤2 min</li></ul></div>
+    <div class="overview-card"><h3>💨 Ventilação</h3><ul><li>Sem via avançada: 30:2</li><li>Com via avançada: 1/6 seg contínuo</li><li>Evitar hiperventilação</li><li>ETCO₂ &lt;10 → melhorar RCP</li></ul></div>
+    <div class="overview-card"><h3>🔋 Desfibrilação</h3><ul><li>FV/TVSP: choque imediato</li><li>Pausa pré-choque ≤10 seg</li><li>RCP imediata após choque</li><li>Análise ritmo a cada 2 min</li></ul></div>
+  </div>
+</div>
+
+<!-- ===== SISTEMAS DE ATENDIMENTO ===== -->
+<div class="section" id="sistemas">
+  <h2>Sistemas de Atendimento</h2>
+  <p class="subtitle">// cadeias de sobrevivência, melhoria contínua e abordagem sistemática</p>
+
+  <div class="alert-box blue" style="margin-bottom:22px"><strong>Conceito central:</strong> O desfecho do paciente depende não apenas da habilidade clínica individual, mas da eficiência do <em>sistema completo</em> de atendimento — desde o reconhecimento até a reabilitação.</div>
+
+  <h3 style="font-size:.95rem;font-family:'Space Mono',monospace;color:var(--accent4);margin-bottom:12px;letter-spacing:.05em">■ Cadeia de Sobrevivência — PCREH (Extra-Hospitalar)</h3>
+  <div class="chain">
+    <div class="chain-link"><div class="chain-num" style="background:var(--accent4);color:#000">1</div><div class="chain-body"><h4>Reconhecimento e Ativação do SME</h4><p>Reconhecer PCR (sem resposta + sem respiração normal). Ligar 192/193. Localização precisa. Retrieval do DEA.</p></div></div>
+    <div class="chain-link"><div class="chain-num" style="background:var(--accent4);color:#000">2</div><div class="chain-body"><h4>RCP Imediata de Alta Qualidade</h4><p>Leigo ou socorrista inicia compressões imediatamente. Cada minuto sem RCP reduz a sobrevida em 7–10%.</p></div></div>
+    <div class="chain-link"><div class="chain-num" style="background:var(--accent4);color:#000">3</div><div class="chain-body"><h4>Desfibrilação Imediata com DEA</h4><p>DEA disponível em &lt;3–5 min aumenta drasticamente a sobrevida. Cada minuto sem desfibrilação reduz chance em ~10%.</p></div></div>
+    <div class="chain-link"><div class="chain-num" style="background:var(--accent4);color:#000">4</div><div class="chain-body"><h4>Serviços de Emergência — Básico e Avançado</h4><p>SAMU/SME assume com SAVC completo: via aérea avançada, medicamentos, monitorização contínua.</p></div></div>
+    <div class="chain-link"><div class="chain-num" style="background:var(--accent4);color:#000">5</div><div class="chain-body"><h4>Cuidados Avançados Pós-PCR</h4><p>Hospital: CDT, ICP, suporte hemodinâmico, neuroprognóstico multimodal na UTI.</p></div></div>
+    <div class="chain-link"><div class="chain-num" style="background:var(--accent4);color:#000">6</div><div class="chain-body"><h4>Recuperação (Reabilitação)</h4><p>Reabilitação física, cognitiva e psicossocial. Elo adicionado nas diretrizes 2020 — reconhece sequelas a longo prazo.</p></div></div>
+  </div>
+
+  <div class="sep"></div>
+  <h3 style="font-size:.95rem;font-family:'Space Mono',monospace;color:var(--accent);margin-bottom:12px;letter-spacing:.05em">■ Cadeia de Sobrevivência — PCRIH (Intra-Hospitalar)</h3>
+  <div class="alert-box green" style="margin-bottom:12px"><strong>Diferença-chave:</strong> A PCRIH tem <strong>Vigilância e Prevenção</strong> como 1º elo — o hospital deve identificar pacientes em deterioração ANTES da parada. O reconhecimento precoce de deterioração (Times de Resposta Rápida) é o elo exclusivo da cadeia hospitalar.</div>
+  <div class="chain">
+    <div class="chain-link"><div class="chain-num" style="background:var(--accent);color:#fff">1</div><div class="chain-body"><h4>Vigilância e Prevenção</h4><p>Monitoramento contínuo; Times de Resposta Rápida (TRR); critérios de ativação por sinais vitais alterados.</p></div></div>
+    <div class="chain-link"><div class="chain-num" style="background:var(--accent);color:#fff">2</div><div class="chain-body"><h4>Reconhecimento e Ativação</h4><p>Reconhecer PCR; acionar código; trazer carrinho de emergência + desfibrilador.</p></div></div>
+    <div class="chain-link"><div class="chain-num" style="background:var(--accent);color:#fff">3</div><div class="chain-body"><h4>RCP de Alta Qualidade Imediata</h4><p>Compressões de qualidade por equipe treinada. Trocar compressor a cada ≤2 min.</p></div></div>
+    <div class="chain-link"><div class="chain-num" style="background:var(--accent);color:#fff">4</div><div class="chain-body"><h4>Desfibrilação</h4><p>Desfibrilador hospitalar disponível; pausa pré-choque ≤10 seg; RCP imediata pós-choque.</p></div></div>
+    <div class="chain-link"><div class="chain-num" style="background:var(--accent);color:#fff">5</div><div class="chain-body"><h4>SAVC e Cuidados Pós-PCR</h4><p>Equipe especializada assume; pós-RCE: CDT, ICP, suporte na UTI.</p></div></div>
+    <div class="chain-link"><div class="chain-num" style="background:var(--accent);color:#fff">6</div><div class="chain-body"><h4>Recuperação</h4><p>Reabilitação multidisciplinar com atenção a sequelas físicas, cognitivas e emocionais.</p></div></div>
+  </div>
+
+  <div class="sep"></div>
+  <h3 style="font-size:.95rem;font-family:'Space Mono',monospace;color:var(--yellow);margin-bottom:12px;letter-spacing:.05em">■ MCQ — Melhoria Contínua da Qualidade</h3>
+  <div class="two-col">
+    <div class="info-box"><h3>O que é MCQ?</h3><ul><li>Processo sistemático de coleta e análise de dados</li><li>Identifica lacunas nos sistemas de atendimento</li><li>Implementa melhorias baseadas em evidências</li><li>Ciclo: Dados → Análise → Mudança → Avaliação</li></ul></div>
+    <div class="info-box"><h3>Métricas monitoradas</h3><ul><li>FCT (fração de compressões torácicas)</li><li>ETCO₂ durante a RCP</li><li>Taxa de RCE e sobrevida à alta</li><li>Tempo porta-balão / porta-agulha</li><li>Tempo reconhecimento → 1º choque DEA</li></ul></div>
+  </div>
+
+  <div class="sep"></div>
+  <h3 style="font-size:.95rem;font-family:'Space Mono',monospace;color:var(--accent3);margin-bottom:12px;letter-spacing:.05em">■ Abordagem Sistemática — ABCDE + SAMPLE</h3>
+  <div class="two-col">
+    <div class="info-box">
+      <h3>Avaliação Primária (ABCDE)</h3>
+      <ul>
+        <li><strong>A</strong> — Airway: via aérea permeável?</li>
+        <li><strong>B</strong> — Breathing: respiração adequada? SpO₂?</li>
+        <li><strong>C</strong> — Circulation: pulso? PA? perfusão?</li>
+        <li><strong>D</strong> — Disability: consciência (AVDI), Glasgow, pupilas, glicemia</li>
+        <li><strong>E</strong> — Exposure: temperatura, pele, achados físicos</li>
+      </ul>
+      <div style="font-size:.8rem;color:var(--accent3);margin-top:10px">Avaliar E tratar simultaneamente. Parar no problema mais crítico.</div>
+    </div>
+    <div class="info-box">
+      <h3>Anamnese Secundária (SAMPLE)</h3>
+      <ul>
+        <li><strong>S</strong> — Signs/Symptoms: sinais e sintomas atuais</li>
+        <li><strong>A</strong> — Allergies: alergias conhecidas</li>
+        <li><strong>M</strong> — Medications: medicações em uso</li>
+        <li><strong>P</strong> — Past history: história médica prévia</li>
+        <li><strong>L</strong> — Last oral intake: última refeição/ingesta</li>
+        <li><strong>E</strong> — Events: eventos que levaram ao quadro</li>
+      </ul>
+      <div style="font-size:.8rem;color:var(--accent4);margin-top:10px">Coletada com família/SME em paralelo ao tratamento.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== ALGORITMOS ===== -->
+<div class="section" id="algorithms">
+  <h2>Algoritmos SAVC</h2>
+  <p class="subtitle">// passo a passo dos algoritmos críticos</p>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px">
+    <button class="btn" data-algo="pcr" onclick="showAlgo('pcr',this)">PCR FV/TVSP</button>
+    <button class="btn" data-algo="aesp" onclick="showAlgo('aesp',this)">PCR AESP/Assístole</button>
+    <button class="btn" data-algo="sca" onclick="showAlgo('sca',this)">SCA</button>
+    <button class="btn" data-algo="avc" onclick="showAlgo('avc',this)">AVC</button>
+    <button class="btn" data-algo="brady" onclick="showAlgo('brady',this)">Bradicardia</button>
+    <button class="btn" data-algo="taqui" onclick="showAlgo('taqui',this)">Taquicardia</button>
+    <button class="btn" data-algo="pospcr" onclick="showAlgo('pospcr',this)">Pós-PCR</button>
+  </div>
+  <div id="algoContent"></div>
+</div>
+
+<!-- ===== ATLAS ECG ===== -->
+<div class="section" id="atlas">
+  <h2>Atlas de Ritmos</h2>
+  <p class="subtitle">// traçado animado + critérios + conduta + armadilhas</p>
+  <div class="rhythm-pager" id="rhythmPager"></div>
+  <div class="monitor">
+    <div class="monitor-head">
+      <div class="monitor-lead" id="atlasLead">DII</div>
+      <div class="monitor-hr"><span>FC </span><span id="atlasHR">—</span></div>
+    </div>
+    <svg class="ecg-svg" id="atlasSvg" viewBox="0 0 600 140" preserveAspectRatio="none" height="140"></svg>
+  </div>
+  <div class="rhythm-meta" id="atlasMeta"></div>
+</div>
+
+<!-- ===== TREINO VISUAL ===== -->
+<div class="section" id="train">
+  <h2>Treino Visual de Ritmos</h2>
+  <p class="subtitle">// identifique o ritmo no monitor — sem dicas</p>
+  <div class="monitor">
+    <div class="monitor-head">
+      <div class="monitor-lead">MONITOR</div>
+      <div class="monitor-hr"><span>FC </span><span id="trainHR">—</span></div>
+    </div>
+    <svg class="ecg-svg" id="trainSvg" viewBox="0 0 600 140" preserveAspectRatio="none" height="140"></svg>
+  </div>
+  <div class="train-opts" id="trainOpts"></div>
+  <div class="train-feedback" id="trainFeedback"></div>
+  <div style="display:flex;gap:10px;justify-content:center;margin-top:16px;flex-wrap:wrap">
+    <button class="btn primary" onclick="nextTrain()" id="trainNext" style="display:none">Próximo ritmo →</button>
+  </div>
+  <div class="score-pill" id="trainScore">0 acertos · 0 tentativas</div>
+  <div class="alert-box blue" style="margin-top:16px"><strong>Dica de leitura:</strong> avalie em ordem — <b>frequência</b>, <b>regularidade</b>, <b>QRS</b> (estreito &lt;0,12s ou largo ≥0,12s), <b>onda P</b>. Essa sequência resolve quase todos os ritmos do SAVC.</div>
+</div>
+
+<!-- ===== RECALL ===== -->
+<div class="section" id="recall">
+  <h2>Recall Escrito</h2>
+  <p class="subtitle">// escreva sua resposta de memória, depois compare e autoavalie</p>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px" id="recallDecks"></div>
+  <div class="recall-card">
+    <span class="recall-tag" id="recallTag">—</span>
+    <div class="recall-q" id="recallQ">—</div>
+    <textarea class="recall-input" id="recallInput" placeholder="Digite tudo o que você sabe. Não consulte nada — force o recall ativo."></textarea>
+    <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap">
+      <button class="btn primary" onclick="revealModel()" id="revealBtn">Revelar gabarito</button>
+      <button class="btn" onclick="nextRecall()">Pular →</button>
+    </div>
+    <div class="model-answer" id="modelAnswer"><h5>Resposta-modelo</h5><p id="modelText"></p><div class="keypoints" id="modelKeys"></div></div>
+    <div class="self-rate" id="selfRate">
+      <span style="font-family:'Space Mono',monospace;font-size:.7rem;color:var(--text2);align-self:center">Como você se saiu?</span>
+      <button class="btn" style="border-color:var(--accent);color:var(--accent)" onclick="rateRecall('fraco')">Esqueci muito</button>
+      <button class="btn" style="border-color:var(--yellow);color:var(--yellow)" onclick="rateRecall('medio')">Parcial</button>
+      <button class="btn green" onclick="rateRecall('forte')">Domino ✓</button>
+    </div>
+  </div>
+  <div class="score-pill" id="recallScore"></div>
+</div>
+
+<!-- ===== MEGACODE ===== -->
+<div class="section" id="megacode">
+  <h2>Megacode Simulado</h2>
+  <p class="subtitle">// cenário sequencial — você lidera a equipe. Decida cada passo.</p>
+  <div id="megaSelect">
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <button class="btn primary" style="text-align:left;padding:16px" onclick="startMega(0)"><b>Caso 1 — Colapso súbito</b><br><span style="font-weight:400;color:rgba(255,255,255,.85)">Homem 58a, dor torácica → colapso. FV. Via FV/TVSP completa.</span></button>
+      <button class="btn" style="text-align:left;padding:16px;border-color:var(--purple)" onclick="startMega(1)"><b>Caso 2 — Sem pulso, ritmo organizado</b><br><span style="font-weight:400;color:var(--text2)">Mulher 44a pós-cirúrgica. AESP. Hs &amp; Ts.</span></button>
+      <button class="btn" style="text-align:left;padding:16px;border-color:var(--accent4)" onclick="startMega(2)"><b>Caso 3 — Bradicardia instável</b><br><span style="font-weight:400;color:var(--text2)">Idoso 72a, síncope, FC 38. BAV avançado.</span></button>
+      <button class="btn" style="text-align:left;padding:16px;border-color:var(--yellow)" onclick="startMega(3)"><b>Caso 4 — Taquicardia instável</b><br><span style="font-weight:400;color:var(--text2)">Homem 60a, FC 190 QRS largo, hipotenso.</span></button>
+    </div>
+  </div>
+  <div id="megaGame" style="display:none"></div>
+</div>
+
+<!-- ===== FLASHCARDS ===== -->
+<div class="section" id="flashcards">
+  <h2>Flashcards</h2>
+  <p class="subtitle">// clique no card para revelar — 65+ cards organizados por tema</p>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px" id="deckButtons">
+    <button class="btn" onclick="loadDeck('all')">Todos</button>
+    <button class="btn" onclick="loadDeck('pcr')">PCR</button>
+    <button class="btn" onclick="loadDeck('sca')">SCA</button>
+    <button class="btn" onclick="loadDeck('avc')">AVC</button>
+    <button class="btn" onclick="loadDeck('brady')">Bradicardia</button>
+    <button class="btn" onclick="loadDeck('taqui')">Taquicardia</button>
+    <button class="btn" onclick="loadDeck('pospcr')">Pós-PCR</button>
+    <button class="btn" onclick="loadDeck('farma')">Farmacologia</button>
+    <button class="btn" onclick="loadDeck('sistemas')">Sistemas</button>
+    <button class="btn" onclick="loadDeck('via_aerea')">Via Aérea</button>
+    <button class="btn" onclick="loadDeck('sit_esp')">Sit. Especiais</button>
+    <button class="btn" onclick="loadDeck('equipes')">Equipes</button>
+  </div>
+  <div class="flashcard-container">
+    <div class="flashcard" id="flashcard" onclick="flipCard()">
+      <div class="card-face card-front">
+        <div class="card-label">Pergunta</div>
+        <div class="card-tag" id="cardTag">—</div>
+        <div class="card-text" id="cardQuestion">Carregando...</div>
+        <div class="card-hint">↩ toque para revelar</div>
+      </div>
+      <div class="card-face card-back">
+        <div class="card-label">Resposta</div>
+        <div class="card-answer" id="cardAnswer">—</div>
+      </div>
+    </div>
+  </div>
+  <div class="flashcard-nav">
+    <button class="btn" onclick="prevCard()">← Anterior</button>
+    <div class="card-counter" id="cardCounter">1 / 1</div>
+    <button class="btn" onclick="nextCard()">Próximo →</button>
+  </div>
+  <div style="display:flex;gap:10px;justify-content:center;margin-top:14px;flex-wrap:wrap">
+    <button class="btn fail" onclick="markCard(false)" id="btnFail" style="display:none">✗ Errei</button>
+    <button class="btn success" onclick="markCard(true)" id="btnOk" style="display:none">✓ Sei</button>
+    <button class="btn" onclick="shuffleDeck()">⇌ Embaralhar</button>
+    <button class="btn" onclick="showOnlyFailed()">⚑ Só erradas</button>
+  </div>
+  <div style="margin-top:16px;text-align:center"><div id="deckStats" style="font-family:'Space Mono',monospace;font-size:.7rem;color:var(--text2)"></div></div>
+</div>
+
+<!-- ===== QUIZ ===== -->
+<div class="section" id="quiz">
+  <h2>Quiz SAVC</h2>
+  <p class="subtitle">// 26 questões — meta: 84% para aprovação</p>
+  <div id="quizContent"></div>
+</div>
+
+<!-- ===== FARMACOLOGIA ===== -->
+<div class="section" id="pharma">
+  <h2>Farmacologia SAVC</h2>
+  <p class="subtitle">// doses, indicações e cuidados essenciais</p>
+  <div class="table-scroll">
+  <table class="pharma-table">
+    <thead><tr><th>Medicamento</th><th>Dose / Via</th><th>Indicação</th><th>Cuidados</th></tr></thead>
+    <tbody>
+      <tr><td><div class="drug-name">Epinefrina</div></td><td><div class="dose">PCR: 1mg IV/IO a cada 3–5min</div><div class="dose">Brady/Infusão: 2–10 mcg/min</div></td><td><span class="indication-tag ind-pcr">PCR</span><span class="indication-tag ind-brady">Brady refratária</span></td><td style="font-size:.8rem;color:var(--text2)">Vasopressor de 1ª linha na PCR. Pode piorar isquemia.</td></tr>
+      <tr><td><div class="drug-name">Amiodarona</div></td><td><div class="dose">PCR: 300mg IV/IO bolus (2ª: 150mg)</div><div class="dose">Taqui estável: 150mg IV em 10min</div></td><td><span class="indication-tag ind-pcr">FV/TVSP refratária</span><span class="indication-tag ind-taqui">TV monomórfica</span></td><td style="font-size:.8rem;color:var(--text2)">Hipotensão, bradicardia. Monitorar PA.</td></tr>
+      <tr><td><div class="drug-name">Lidocaína</div></td><td><div class="dose">1–1,5 mg/kg IV/IO bolus</div><div class="dose">Manutenção: 1–4 mg/min</div></td><td><span class="indication-tag ind-pcr">FV/TVSP (alternativa)</span><span class="indication-tag ind-taqui">TV</span></td><td style="font-size:.8rem;color:var(--text2)">Alternativa se amiodarona indisponível.</td></tr>
+      <tr><td><div class="drug-name">Atropina</div></td><td><div class="dose">1mg IV a cada 3–5min (máx 3mg)</div></td><td><span class="indication-tag ind-brady">Bradicardia sintomática</span></td><td style="font-size:.8rem;color:var(--text2)">Não usar em Mobitz II ou BAV 3º grau. Dose &lt;0,5mg pode piorar bradicardia.</td></tr>
+      <tr><td><div class="drug-name">Dopamina</div></td><td><div class="dose">5–20 mcg/kg/min infusão</div></td><td><span class="indication-tag ind-brady">Bradicardia refratária</span></td><td style="font-size:.8rem;color:var(--text2)">Doses >10 mcg: vasoconstricção. Evitar hipovolemia.</td></tr>
+      <tr><td><div class="drug-name">Adenosina</div></td><td><div class="dose">6mg IV rápido + flush (2ª: 12mg, 3ª: 12mg)</div></td><td><span class="indication-tag ind-taqui">TSV (complexo estreito regular)</span></td><td style="font-size:.8rem;color:var(--text2)">Bolus ultra-rápido + flush imediato. Meia-vida &lt;10s. Assistolia transitória.</td></tr>
+      <tr><td><div class="drug-name">Aspirina</div></td><td><div class="dose">162–325mg VO mastigável</div></td><td><span class="indication-tag ind-sca">SCA</span></td><td style="font-size:.8rem;color:var(--text2)">Mastigada = absorção mais rápida. CI: alergia, hemorragia GI ativa.</td></tr>
+      <tr><td><div class="drug-name">Nitroglicerina</div></td><td><div class="dose">SL: 1 comp a cada 3–5min (máx 3)</div><div class="dose">IV: titular, manter PAS >90</div></td><td><span class="indication-tag ind-sca">SCA — alívio isquêmico</span></td><td style="font-size:.8rem;color:var(--text2)">CI: PAS &lt;90, FC &lt;50 ou >100, infarto VD, inibidor PDE-5 recente.</td></tr>
+      <tr><td><div class="drug-name">Morfina</div></td><td><div class="dose">2–4mg IV, titular</div></td><td><span class="indication-tag ind-sca">IAMST — dor refratária</span></td><td style="font-size:.8rem;color:var(--text2)">Cautela no SCA-SSST (↑mortalidade). Reduz absorção antiplaquetários orais.</td></tr>
+      <tr><td><div class="drug-name">Alteplase (rtPA)</div></td><td><div class="dose">AVC: 0,9 mg/kg IV (máx 90mg)</div><div class="dose">10% bolus 1min + restante 60min</div></td><td><span class="indication-tag ind-avc">AVC isquêmico &lt;3h (ou &lt;4,5h)</span></td><td style="font-size:.8rem;color:var(--text2)">CI absoluta: hemorragia IC. PA ≤185/110 antes. Não anticoagular por 24h.</td></tr>
+      <tr><td><div class="drug-name">Labetalol</div></td><td><div class="dose">10–20mg IV em 1–2min (repetir 1x)</div></td><td><span class="indication-tag ind-avc">Hipertensão pré-alteplase</span></td><td style="font-size:.8rem;color:var(--text2)">β-bloqueador não-seletivo. Meta: PA ≤185/110 antes do alteplase.</td></tr>
+      <tr><td><div class="drug-name">Nicardipina</div></td><td><div class="dose">5 mg/h IV, titular 2,5mg/h a cada 5min</div></td><td><span class="indication-tag ind-avc">Hipertensão pré-alteplase</span></td><td style="font-size:.8rem;color:var(--text2)">Bloqueador de canal de cálcio. Alternativa ao labetalol.</td></tr>
+      <tr><td><div class="drug-name">Sulfato de Mg²⁺</div></td><td><div class="dose">1–2g IV em 15min (rápido na PCR)</div></td><td><span class="indication-tag ind-taqui">Torsades de pointes</span><span class="indication-tag ind-pcr">FV hipomagnesemia</span></td><td style="font-size:.8rem;color:var(--text2)">Infundir lento fora de PCR. Monitorar reflexos e PA.</td></tr>
+      <tr><td><div class="drug-name">Naloxona</div></td><td><div class="dose">0,4–2mg IV/IO/IM/IN; repetir 2–3min</div></td><td><span class="indication-tag" style="background:rgba(167,139,250,.2);color:var(--purple)">Overdose opioides</span></td><td style="font-size:.8rem;color:var(--text2)">Meia-vida curta — pode precisar repetir. Prioridade: ventilação BVM antes da naloxona.</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <div class="sep"></div>
+  <div class="alert-box yellow"><strong>⚡ Regra de ouro:</strong> Na PCR → epinefrina a cada 3–5 min. Amiodarona 300mg após 3º choque (FV/TVSP). Nunca interromper RCP por >10 segundos. Na bradicardia instável → atropina 1mg (não em Mobitz II / BAV 3º QRS largo).</div>
+</div>
+
+<!-- ===== TEMPOS ===== -->
+<div class="section" id="times">
+  <h2>Tempos-Alvo Críticos</h2>
+  <p class="subtitle">// memorize — cobrados no Megacode e no exame cognitivo</p>
+  <h3 style="font-size:.9rem;color:var(--accent2);font-family:'Space Mono',monospace;margin-bottom:14px;letter-spacing:.06em">■ SCA / IAMST</h3>
+  <div class="table-scroll"><table class="times-table"><thead><tr><th>Meta</th><th>Tempo</th><th>Observação</th></tr></thead><tbody>
+    <tr><td>Porta → ECG (DE)</td><td class="time-val">≤10 min</td><td>Avaliação simultânea DE + hemo</td></tr>
+    <tr><td>Porta → balão (ICP)</td><td class="time-val">≤90 min</td><td>1º contato médico → insuflação</td></tr>
+    <tr><td>1º contato → balão (transferência)</td><td class="time-val">≤120 min</td><td>Quando ICP requer transferência</td></tr>
+    <tr><td>Porta → agulha (fibrinolítico)</td><td class="time-val">≤30 min</td><td>Se ICP não disponível em 90 min</td></tr>
+    <tr><td>Porta → partida (para ICP)</td><td class="time-val">≤30 min</td><td>Preparar alta para outro centro</td></tr>
+  </tbody></table></div>
+  <div class="sep"></div>
+  <h3 style="font-size:.9rem;color:var(--accent3);font-family:'Space Mono',monospace;margin-bottom:14px;letter-spacing:.06em">■ AVC Isquêmico</h3>
+  <div class="table-scroll"><table class="times-table"><thead><tr><th>Meta</th><th>Tempo Máximo</th><th>Referência</th></tr></thead><tbody>
+    <tr><td>Avaliação geral</td><td class="time-val">10 min da chegada</td><td>DE ou sala de imagem</td></tr>
+    <tr><td>TC/RM + neurológico</td><td class="time-val">20 min da chegada</td><td>Direto para sala de TC</td></tr>
+    <tr><td>Interpretação TC/RM</td><td class="time-val">45 min da chegada</td><td>—</td></tr>
+    <tr><td>Porta → agulha (alteplase)</td><td class="time-val">≤60 min (meta ≤45 min)</td><td>Meta de AVC III</td></tr>
+    <tr><td>Sintomas → alteplase</td><td class="time-val">≤3h (ou ≤4,5h selecionados)</td><td>0,9 mg/kg máx 90mg</td></tr>
+    <tr><td>Porta → dispositivo TEV (direto)</td><td class="time-val">≤90 min</td><td>Meta de AVC III</td></tr>
+    <tr><td>Porta → dispositivo TEV (transferência)</td><td class="time-val">≤60 min</td><td>—</td></tr>
+    <tr><td>Sintomas → TEV (6–16h)</td><td class="time-val">Critérios DAWN / DEFUSE-3</td><td>Oclusão vaso grande</td></tr>
+    <tr><td>Sintomas → TEV (16–24h)</td><td class="time-val">Critérios DAWN</td><td>—</td></tr>
+    <tr><td>Internação monitorada</td><td class="time-val">≤3h</td><td>—</td></tr>
+  </tbody></table></div>
+  <div class="sep"></div>
+  <h3 style="font-size:.9rem;color:var(--accent4);font-family:'Space Mono',monospace;margin-bottom:14px;letter-spacing:.06em">■ Parâmetros de RCP</h3>
+  <div class="table-scroll"><table class="times-table"><thead><tr><th>Parâmetro</th><th>Valor-Alvo</th></tr></thead><tbody>
+    <tr><td>Frequência das compressões</td><td class="time-val">100–120/min</td></tr>
+    <tr><td>Profundidade</td><td class="time-val">5–6 cm</td></tr>
+    <tr><td>Pausa máxima análise/choque</td><td class="time-val">≤10 seg</td></tr>
+    <tr><td>Troca de compressor</td><td class="time-val">≤2 min</td></tr>
+    <tr><td>Ventilação (via aérea avançada)</td><td class="time-val">1 ventilação a cada 6 seg</td></tr>
+    <tr><td>PPC mínima para RCE</td><td class="time-val">≥15 mmHg</td></tr>
+    <tr><td>ETCO₂ mínimo durante RCP</td><td class="time-val">&gt;10 mmHg</td></tr>
+    <tr><td>Elevação ETCO₂ → suspeitar RCE</td><td class="time-val">&gt;25 mmHg</td></tr>
+    <tr><td>SpO₂ alvo pós-RCE</td><td class="time-val">92–98%</td></tr>
+    <tr><td>ETCO₂ alvo pós-RCE (ventilação)</td><td class="time-val">35–40 mmHg</td></tr>
+  </tbody></table></div>
+</div>
+
+<!-- ===== Hs Ts ===== -->
+<div class="section" id="hsts">
+  <h2>Hs &amp; Ts — Causas Reversíveis</h2>
+  <p class="subtitle">// causas potencialmente reversíveis de PCR e AESP — memorize todas</p>
+  <div class="hs-ts-grid">
+    <div class="hs-box">
+      <div class="hs-ts-title">// 5 Hs</div>
+      <div class="hs-ts-item"><div class="hs-ts-letter" style="color:var(--accent4)">H</div><div class="hs-ts-text"><strong>Hipovolemia</strong><div class="hs-ts-sub">Causa mais comum de AESP. QRS estreito + taquicardia. Tratar com volume agressivo.</div></div></div>
+      <div class="hs-ts-item"><div class="hs-ts-letter" style="color:var(--accent4)">H</div><div class="hs-ts-text"><strong>Hipóxia</strong><div class="hs-ts-sub">2ª causa mais comum. Garantir via aérea permeável e ventilação adequada.</div></div></div>
+      <div class="hs-ts-item"><div class="hs-ts-letter" style="color:var(--accent4)">H</div><div class="hs-ts-text"><strong>H⁺ (Acidemia)</strong><div class="hs-ts-sub">Acidose metabólica grave. Bicarbonato se grave ou hipercalemia associada.</div></div></div>
+      <div class="hs-ts-item"><div class="hs-ts-letter" style="color:var(--accent4)">H</div><div class="hs-ts-text"><strong>Hipo/Hipercalemia</strong><div class="hs-ts-sub">ECG: T pontiagudas (hiper), ondas U (hipo). Corrigir eletrólito.</div></div></div>
+      <div class="hs-ts-item"><div class="hs-ts-letter" style="color:var(--accent4)">H</div><div class="hs-ts-text"><strong>Hipotermia</strong><div class="hs-ts-sub">RCP prolongada, reaquecimento ativo. "Não está morto até estar quente e morto."</div></div></div>
+    </div>
+    <div class="ts-box">
+      <div class="hs-ts-title">// 5 Ts</div>
+      <div class="hs-ts-item"><div class="hs-ts-letter" style="color:var(--accent)">T</div><div class="hs-ts-text"><strong>pneumo<em>T</em>órax hipertensivo</strong><div class="hs-ts-sub">Desvio traqueia, ausência MV, hipotensão. Agulha 2º EIC, LMC.</div></div></div>
+      <div class="hs-ts-item"><div class="hs-ts-letter" style="color:var(--accent)">T</div><div class="hs-ts-text"><strong>Tamponamento cardíaco</strong><div class="hs-ts-sub">Tríade de Beck: hipotensão + TJV + bulhas abafadas. Pericardiocentese.</div></div></div>
+      <div class="hs-ts-item"><div class="hs-ts-letter" style="color:var(--accent)">T</div><div class="hs-ts-text"><strong>Toxinas</strong><div class="hs-ts-sub">Opioides (naloxona), β-bloqueadores, BCCa, tricíclicos. Ver antídoto específico.</div></div></div>
+      <div class="hs-ts-item"><div class="hs-ts-letter" style="color:var(--accent)">T</div><div class="hs-ts-text"><strong>Trombose pulmonar (TEP)</strong><div class="hs-ts-sub">S1Q3T3, BRD, IVD aguda. Fibrinolítico ou embolectomia.</div></div></div>
+      <div class="hs-ts-item"><div class="hs-ts-letter" style="color:var(--accent)">T</div><div class="hs-ts-text"><strong>Trombose coronária (IAMST)</strong><div class="hs-ts-sub">SCA como causa da PCR. ICP de resgate pós-RCE.</div></div></div>
+    </div>
+  </div>
+  <div class="sep"></div>
+  <div class="alert-box blue"><strong>💡 Mnemônico:</strong> <em>"Hipo VAHO → Pneumo Tamp Tox TEP Trombo-coronária"</em><br>V=Volemia · A=Ar(O₂) · H=H⁺ · O=K⁺(potássio) · última H=Hipotermia</div>
+  <div class="sep"></div>
+  <h3 style="font-size:.95rem;font-weight:700;margin-bottom:16px">ECG e clínica para causa de AESP</h3>
+  <div class="overview-grid">
+    <div class="overview-card"><h3>QRS estreito + rápido</h3><ul><li>→ causa mecânica: hipovolemia</li><li>Infundir volume rapidamente</li><li>USG: colapso de VCI</li></ul></div>
+    <div class="overview-card"><h3>Hipercalemia</h3><ul><li>T pontiagudas → alargamento QRS</li><li>Gluconato de cálcio + bicarbonato</li><li>Insulina/glicose, salbutamol</li></ul></div>
+    <div class="overview-card"><h3>EP Maciça</h3><ul><li>S1Q3T3, BRD novo, taquicardia sinusal</li><li>Alteplase 100mg IV em PCR por TEP</li><li>RCP por 60–90min após fibrinolítico</li></ul></div>
+    <div class="overview-card"><h3>Tamponamento</h3><ul><li>USG: derrame pericárdico + colapso AD</li><li>Pericardiocentese guiada por USG</li><li>Alternativa: janela pericárdica cirúrgica</li></ul></div>
+  </div>
+</div>
+
+<!-- ===== VIA AÉREA ===== -->
+<div class="section" id="airways">
+  <h2>Via Aérea &amp; Parada Respiratória</h2>
+  <p class="subtitle">// dispositivos, confirmação de posição, capnografia e acesso IO</p>
+
+  <div class="two-col" style="margin-bottom:20px">
+    <div class="info-box" style="border-top:3px solid var(--accent4)">
+      <h3>Adjuntos Básicos de Via Aérea</h3>
+      <ul>
+        <li><strong>COA (cânula orofaríngea):</strong> apenas inconscientes sem reflexo de gag. Mantém língua afastada.</li>
+        <li><strong>CNF (cânula nasofaríngea):</strong> pode usar em semi-conscientes ou com trismo. Menos estímulo ao vômito.</li>
+        <li>Ambas COMPLEMENTAM a posição de cabeça-queixo ou tração mandibular.</li>
+        <li>Medida da COA: ângulo da boca → lóbulo da orelha.</li>
+      </ul>
+    </div>
+    <div class="info-box" style="border-top:3px solid var(--accent3)">
+      <h3>Ventilação com Bolsa-Máscara (BVM)</h3>
+      <ul>
+        <li>Técnica E-C com 2 mãos é superior a 1 mão.</li>
+        <li>Volume: expansão visível do tórax (≈500 mL).</li>
+        <li>Sem via aérea avançada: 30:2 (pausar compressões).</li>
+        <li>Evitar excesso de volume — distensão gástrica e regurgitação.</li>
+        <li>O₂ a 15 L/min pelo reservatório → FiO₂ ≥85%.</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3 style="font-size:.9rem;color:var(--accent);font-family:'Space Mono',monospace;margin-bottom:12px;letter-spacing:.05em">■ Via Aérea Avançada — Dispositivos</h3>
+  <div class="overview-grid" style="margin-bottom:20px">
+    <div class="overview-card"><h3>Intubação Orotraqueal (IOT)</h3><ul><li>Padrão-ouro — protege de aspiração</li><li>Confirmar: expansão bilateral + ausculta + capnografia</li><li>Profundidade: ≈21–23 cm no canto da boca</li><li>Pausa para laringoscopia ≤10 seg</li></ul></div>
+    <div class="overview-card"><h3>Máscara Laríngea (ML)</h3><ul><li>Supraglótico — inserção mais rápida</li><li>Não protege completamente de aspiração</li><li>Alternativa se IOT difícil/impossível</li><li>Confirmar com capnografia</li></ul></div>
+    <div class="overview-card"><h3>Tubo Laringotraqueal (TLT)</h3><ul><li>Dispositivo supraglótico duplo lúmen</li><li>Inserção às cegas — treinamento menor</li><li>Igual ao ML em eficácia durante RCP</li><li>Balão esofágico + balão faríngeo</li></ul></div>
+  </div>
+
+  <h3 style="font-size:.9rem;color:var(--yellow);font-family:'Space Mono',monospace;margin-bottom:12px;letter-spacing:.05em">■ Confirmação de Posição do Tubo (5 Métodos)</h3>
+  <div class="chain" style="margin-bottom:20px">
+    <div class="chain-link"><div class="chain-num" style="background:var(--yellow);color:#000">1</div><div class="chain-body"><h4>Inspeção</h4><p>Expansão bilateral e simétrica do tórax durante cada ventilação.</p></div></div>
+    <div class="chain-link"><div class="chain-num" style="background:var(--yellow);color:#000">2</div><div class="chain-body"><h4>Ausculta Epigástrica</h4><p>Ausência de borborigmos ao ventiar — presença confirma intubação esofágica.</p></div></div>
+    <div class="chain-link"><div class="chain-num" style="background:var(--yellow);color:#000">3</div><div class="chain-body"><h4>Ausculta Bilateral</h4><p>Murmúrio vesicular presente e simétrico bilateralmente.</p></div></div>
+    <div class="chain-link"><div class="chain-num" style="background:var(--accent3);color:#000">4</div><div class="chain-body"><h4>Capnografia de Forma de Onda — CONFIRMATÓRIO</h4><p>ETCO₂ detectado e forma de onda presente = tubo no trato respiratório. Método mais confiável. Confirma posição E monitora qualidade da RCP.</p></div></div>
+    <div class="chain-link"><div class="chain-num" style="background:var(--yellow);color:#000">5</div><div class="chain-body"><h4>Radiografia de Tórax</h4><p>Confirmação definitiva da profundidade: ponta do tubo 2–4 cm acima da carina.</p></div></div>
+  </div>
+
+  <h3 style="font-size:.9rem;color:var(--accent3);font-family:'Space Mono',monospace;margin-bottom:12px;letter-spacing:.05em">■ Capnografia — Interpretação na PCR</h3>
+  <div class="overview-grid" style="margin-bottom:20px">
+    <div class="overview-card"><h3>ETCO₂ &lt;10 mmHg</h3><ul><li>Baixo débito cardíaco</li><li>Má qualidade de RCP</li><li>→ Melhorar frequência/profundidade</li><li>→ Checar posição das mãos</li></ul></div>
+    <div class="overview-card"><h3>ETCO₂ 10–25 mmHg</h3><ul><li>RCP em curso</li><li>Adequado durante ressuscitação</li><li>Continuar ciclos normalmente</li></ul></div>
+    <div class="overview-card"><h3>ETCO₂ &gt;25 mmHg (súbito)</h3><ul><li>Possível RCE!</li><li>Verificar pulso e ritmo</li><li>Se pulso presente → cuidados pós-PCR</li></ul></div>
+    <div class="overview-card"><h3>Pós-RCE (ventilação)</h3><ul><li>Alvo: 35–40 mmHg</li><li>Hipocapnia (&lt;35) → vasoconstrição cerebral</li><li>Hiperventilação é deletéria</li></ul></div>
+  </div>
+
+  <h3 style="font-size:.9rem;color:var(--purple);font-family:'Space Mono',monospace;margin-bottom:12px;letter-spacing:.05em">■ Acesso IV/IO</h3>
+  <div class="two-col">
+    <div class="info-box"><h3>Acesso IV Periférico</h3><ul><li>1ª escolha: fossa antecubital, antebraço</li><li>Evitar veias distais das mãos/pés durante RCP</li><li>Adenosina: veia antecubital obrigatória + flush</li><li>Flush 20 mL após cada medicamento na PCR</li></ul></div>
+    <div class="info-box"><h3>Acesso IO (Intraósseo)</h3><ul><li>Indicado: acesso IV impossível ou demorado</li><li>Locais: tíbia proximal, úmero, tíbia distal</li><li>Início de ação idêntico ao IV</li><li>Todas as drogas da PCR podem ser administradas via IO</li><li>Confirmar posição antes de usar</li></ul></div>
+  </div>
+</div>
+
+<!-- ===== SITUAÇÕES ESPECIAIS ===== -->
+<div class="section" id="especiais">
+  <h2>Situações Especiais</h2>
+  <p class="subtitle">// hipotermia · overdose opioides · RCPEC · gestação · DAV</p>
+
+  <div class="algo-box" style="border-top:3px solid var(--accent4)">
+    <h3 style="font-size:1rem;font-weight:800;color:var(--accent4);margin-bottom:20px">❄ Hipotermia Acidental</h3>
+    <div class="algo-step">
+      <div class="step-num blue">1</div>
+      <div class="step-content"><h4>Reconhecimento</h4><p>Temperatura central &lt;35°C. Grave: &lt;30°C. PCR em hipotermia pode ter prognóstico favorável com tratamento correto.</p></div>
+    </div>
+    <div class="algo-step">
+      <div class="step-num blue">2</div>
+      <div class="step-content"><h4>RCP e Desfibrilação</h4><p>Iniciar RCP de alta qualidade. Abaixo de 30°C: até 1–3 tentativas de desfibrilação. Se sem resposta, focar no reaquecimento antes de mais choques. <span class="highlight blue">Não desfibrilar repetidamente abaixo de 30°C.</span></p></div>
+    </div>
+    <div class="algo-step">
+      <div class="step-num blue">3</div>
+      <div class="step-content"><h4>Reaquecimento</h4><p><b>Ativo externo:</b> cobertores aquecidos, ar quente, compressas quentes (axilas/virilhas).<br><b>Ativo interno:</b> fluidos IV aquecidos (43°C), O₂ aquecido/umidificado.<br><b>Ativo central:</b> RCPEC — método ideal em PCR por hipotermia profunda.</p></div>
+    </div>
+    <div class="algo-step">
+      <div class="step-num blue">4</div>
+      <div class="step-content"><h4>Regra Fundamental</h4><p><span class="highlight blue">"Não está morto até estar quente e morto."</span> Continuar RCP até reaquecimento ≥32–35°C ou decisão médica após avaliação. Hipocalemia grave (K⁺ >12 mEq/L) prediz morte irreversível.</p></div>
+    </div>
+  </div>
+
+  <div class="algo-box" style="border-top:3px solid var(--purple)">
+    <h3 style="font-size:1rem;font-weight:800;color:var(--purple);margin-bottom:20px">💊 Overdose de Opioides</h3>
+    <div class="algo-step">
+      <div class="step-num purple">1</div>
+      <div class="step-content"><h4>Reconhecer</h4><p>Depressão respiratória + pupilas mióticas (puntiformes) + alteração do nível de consciência. Pode haver cianose e bradipneia extrema.</p></div>
+    </div>
+    <div class="algo-step">
+      <div class="step-num purple">2</div>
+      <div class="step-content"><h4>Ventilação — PRIORIDADE #1</h4><p>A causa de morte é a <b>apneia</b>. Ventilar com BVM + O₂ 15L/min é a intervenção mais importante. Abrir via aérea, posicionar, ventilar antes de qualquer medicamento.</p></div>
+    </div>
+    <div class="algo-step">
+      <div class="step-num purple">3</div>
+      <div class="step-content"><h4>Naloxona</h4><p><b>0,4–2mg IV/IO</b> (ou IM/IN). Repetir a cada 2–3 min se sem resposta. Reverte depressão respiratória e sedação por opioides.<br>⚠ Meia-vida curta (30–90 min): risco de ressedação. Monitorar por 4–6h.</p></div>
+    </div>
+    <div class="algo-step">
+      <div class="step-num purple">4</div>
+      <div class="step-content"><h4>Se PCR Confirmada</h4><p>Tratar como PCR padrão (algoritmo FV/TVSP ou AESP/assístole). Naloxona é adjunto — não substitui RCP de alta qualidade.</p></div>
+    </div>
+  </div>
+
+  <div class="algo-box" style="border-top:3px solid var(--accent3)">
+    <h3 style="font-size:1rem;font-weight:800;color:var(--accent3);margin-bottom:20px">🔄 RCPEC — RCP Extracorpórea</h3>
+    <div class="algo-step">
+      <div class="step-num green">1</div>
+      <div class="step-content"><h4>O que é</h4><p>Uso de circulação extracorpórea (ECMO venoarterial) durante a PCR para manter perfusão enquanto a causa reversível é tratada.</p></div>
+    </div>
+    <div class="algo-step">
+      <div class="step-num green">2</div>
+      <div class="step-content"><h4>Indicações</h4><p>• PCR refratária sem causa reversível óbvia<br>• Hipotermia profunda<br>• Intoxicação grave (β-bloqueadores, BCCa)<br>• EP maciça (pode permitir embolectomia)<br>• Jovem sem comorbidades, PCR presenciada</p></div>
+    </div>
+    <div class="algo-step">
+      <div class="step-num green">3</div>
+      <div class="step-content"><h4>Requisitos</h4><p>Infraestrutura hospitalar especializada. RCP de alta qualidade contínua enquanto se prepara a circulação extracorpórea. Não há benefício em parar RCP para implantar.</p></div>
+    </div>
+  </div>
+
+  <div class="algo-box" style="border-top:3px solid var(--yellow)">
+    <h3 style="font-size:1rem;font-weight:800;color:var(--yellow);margin-bottom:20px">🤰 PCR na Gestação</h3>
+    <div class="algo-step">
+      <div class="step-num yellow">1</div>
+      <div class="step-content"><h4>RCP Padrão + Ação Específica</h4><p>Iniciar RCP de alta qualidade imediatamente. Posição das mãos: levemente mais alta (sobre o esterno).<br><span class="highlight yellow">Deslocamento uterino esquerdo MANUAL</span> em gestações ≥20 semanas — alivia compressão aortocava e melhora retorno venoso.</p></div>
+    </div>
+    <div class="algo-step">
+      <div class="step-num yellow">2</div>
+      <div class="step-content"><h4>Causas Específicas na Gestação</h4><p>Hemorragia, embolia por líquido amniótico, eclâmpsia (sulfato de Mg²⁺), sepse, cardiomiopatia periparto, tromboembolismo. Buscar e tratar a causa.</p></div>
+    </div>
+    <div class="algo-step">
+      <div class="step-num yellow">3</div>
+      <div class="step-content"><h4>Cesariana de Emergência</h4><p>Se sem RCE em <span class="highlight yellow">≤5 minutos</span> de RCP em gestação ≥20 semanas → cesariana de emergência à beira do leito. Pode salvar <b>mãe E feto</b> ao melhorar retorno venoso materno.</p></div>
+    </div>
+  </div>
+
+  <div class="algo-box" style="border-top:3px solid var(--accent2)">
+    <h3 style="font-size:1rem;font-weight:800;color:var(--accent2);margin-bottom:20px">🔧 DAV — Dispositivo de Assistência Ventricular</h3>
+    <div class="algo-step">
+      <div class="step-num" style="background:var(--accent2);color:#000">1</div>
+      <div class="step-content"><h4>Reconhecer PCR em Paciente com DAV</h4><p>Pulso pode estar ausente mesmo com débito cardíaco adequado (fluxo contínuo). Confirmar pelo monitor do dispositivo.</p></div>
+    </div>
+    <div class="algo-step">
+      <div class="step-num" style="background:var(--accent2);color:#000">2</div>
+      <div class="step-content"><h4>Manejo</h4><p>NÃO desligar o DAV. Compressões podem ser necessárias com cautela (risco de desconexão das cânulas). Contatar equipe especializada imediatamente.</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== EQUIPES ===== -->
+<div class="section" id="equipes">
+  <h2>Equipes de Alto Desempenho</h2>
+  <p class="subtitle">// liderança, papéis, comunicação e dinâmica eficiente</p>
+
+  <h3 style="font-size:.9rem;color:var(--accent4);font-family:'Space Mono',monospace;margin-bottom:12px;letter-spacing:.05em">■ 6 Papéis Funcionais</h3>
+  <div class="overview-grid" style="margin-bottom:20px">
+    <div class="overview-card"><h3>👤 Líder da Equipe</h3><ul><li>Posiciona-se a 1,5–2m do paciente</li><li>Visão global do cenário</li><li>Direciona tarefas com nomes</li><li>Monitora qualidade da RCP</li><li>Decisão de medicamentos e intervenções</li></ul></div>
+    <div class="overview-card"><h3>💪 Compressor</h3><ul><li>Compressões de alta qualidade</li><li>Vocaliza frequência e profundidade</li><li>Solicita troca a cada ≤2 min</li><li>Posição: braços retos, peso do corpo</li></ul></div>
+    <div class="overview-card"><h3>🫁 Via Aérea</h3><ul><li>BVM ou dispositivo avançado</li><li>Confirma posição do tubo</li><li>Monitora capnografia</li><li>1 vent/6 seg (via avançada inserida)</li></ul></div>
+    <div class="overview-card"><h3>📟 Monitor/Desfibrilador</h3><ul><li>Conecta eletrodos/pás rapidamente</li><li>Opera o desfibrilador</li><li>Anuncia ritmo em voz alta</li><li>Prepara carga + anuncia "afastem"</li></ul></div>
+    <div class="overview-card"><h3>💉 Acesso/Medicamentos</h3><ul><li>Obtém acesso IV ou IO</li><li>Prepara e administra drogas</li><li>Verbaliza dose + via + horário</li><li>Anuncia confirmação após admin.</li></ul></div>
+    <div class="overview-card"><h3>⏱ Temporizador/Registrador</h3><ul><li>Ativa timer ao iniciar RCP</li><li>Anuncia ciclos de 2 min</li><li>Registra todos os eventos/tempos</li><li>Lembra próxima dose de epinefrina</li></ul></div>
+  </div>
+
+  <h3 style="font-size:.9rem;color:var(--accent3);font-family:'Space Mono',monospace;margin-bottom:12px;letter-spacing:.05em">■ Elementos da Dinâmica Eficiente</h3>
+  <div class="algo-box">
+    <div class="algo-step">
+      <div class="step-num green">1</div>
+      <div class="step-content"><h4>Comunicação com Alça Fechada (Closed-Loop)</h4><p>Líder nomeia + dá ordem → receptor repete → líder confirma.<br><i>Exemplo: "Maria, adm. epinefrina 1mg IV" → "Administrando epinefrina 1mg IV" → "Confirmado."</i><br>Elimina ambiguidade. Sem alça fechada, ordens ficam "no ar".</p></div>
+    </div>
+    <div class="algo-step">
+      <div class="step-num green">2</div>
+      <div class="step-content"><h4>Mensagens Claras e Respeitosas</h4><p>Tom de voz calmo e assertivo. Criticar o ERRO, não a PESSOA. Cada membro pode (e deve) alertar sobre erros percebidos — "voz segura".</p></div>
+    </div>
+    <div class="algo-step">
+      <div class="step-num green">3</div>
+      <div class="step-content"><h4>Conhecimento Situacional Compartilhado</h4><p>Líder resume o quadro periodicamente: "Estamos no ciclo 3, FV persiste, epinefrina administrada, próximo choque em 30 segundos." Toda a equipe sabe onde está.</p></div>
+    </div>
+    <div class="algo-step">
+      <div class="step-num green">4</div>
+      <div class="step-content"><h4>Distribuição de Carga de Trabalho</h4><p>Líder monitora sobrecarga individual. Redistribui tarefas quando necessário. Pede e oferece ajuda proativamente.</p></div>
+    </div>
+    <div class="algo-step">
+      <div class="step-num green">5</div>
+      <div class="step-content"><h4>Debriefing Pós-Atendimento</h4><p>Reunião breve após cada PCR para revisar o desempenho. Identifica o que foi bem e o que melhorar. Essencial para o MCQ e aprendizado da equipe.</p></div>
+    </div>
+  </div>
+
+  <div class="alert-box blue">
+    <strong>📊 Pesquisa mostra:</strong> equipes treinadas em dinâmica e comunicação têm FCT significativamente maior, menos erros de medicação e maior taxa de RCE — independente da experiência clínica individual.
+  </div>
+</div>
+
+</main>
+
+<script>
+// ============ NAV ============
+function showSection(id){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  const navMap={overview:0,sistemas:1,algorithms:2,atlas:3,train:4,recall:5,megacode:6,flashcards:7,quiz:8,pharma:9,times:10,hsts:11,airways:12,especiais:13,equipes:14};
+  const idx=navMap[id];
+  if(idx!==undefined) document.querySelectorAll('.nav-btn')[idx]?.classList.add('active');
+  if(id==='flashcards'&&!currentDeck.length) loadDeck('all');
+  if(id==='quiz') startQuiz();
+  if(id==='atlas'){renderPager();renderAtlas();}
+  if(id==='train') nextTrain();
+  if(id==='recall'){renderRecallDecks();renderRecall();}
+  if(id==='megacode'){document.getElementById('megaGame').style.display='none';document.getElementById('megaSelect').style.display='';}
+  if(id==='algorithms') setTimeout(()=>{const b=document.querySelector('[data-algo=pcr]');if(b&&!document.getElementById('algoContent').innerHTML)showAlgo('pcr',b);},80);
+}
+// ============ ECG GENERATOR ============
+function rhythmPath(type){
+  let d='M0,70';const W=600;let x=0;
+  const lineTo=(nx,ny)=>{d+=` L${nx.toFixed(1)},${ny.toFixed(1)}`;};
+  function pBeat(cycleW,opts={}){
+    const o=Object.assign({p:8,pr:0.16,qrs:1,t:12,baseline:70,inv:false},opts);
+    let cx=x;
+    const pStart=cx+cycleW*0.05;
+    lineTo(pStart,70);
+    if(o.p>0){lineTo(pStart+cycleW*0.04,70-o.p);lineTo(pStart+cycleW*0.08,70);}
+    const qrsStart=cx+cycleW*(0.05+o.pr*1.1);
+    lineTo(qrsStart,70);
+    if(o.wide){lineTo(qrsStart+cycleW*0.03,78);lineTo(qrsStart+cycleW*0.10,70-38*o.qrs);lineTo(qrsStart+cycleW*0.18,82);lineTo(qrsStart+cycleW*0.24,70);}
+    else{lineTo(qrsStart+cycleW*0.02,76);lineTo(qrsStart+cycleW*0.05,70-42*o.qrs);lineTo(qrsStart+cycleW*0.08,80);lineTo(qrsStart+cycleW*0.11,70);}
+    const tStart=qrsStart+cycleW*(o.wide?0.30:0.18);
+    lineTo(tStart,70);
+    const tAmp=o.inv?-o.t:o.t;
+    lineTo(tStart+cycleW*0.05,70-tAmp);lineTo(tStart+cycleW*0.10,70);
+    x+=cycleW;lineTo(x,70);
+  }
+  switch(type){
+    case 'sinus': for(let i=0;i<6;i++)pBeat(100); break;
+    case 'sinusbrady': for(let i=0;i<3;i++)pBeat(200); break;
+    case 'sinustaq': for(let i=0;i<10;i++)pBeat(60,{p:6}); break;
+    case 'fv':{d='M0,70';let cx=0;while(cx<W){const amp=(Math.random()*50-25);const step=8+Math.random()*8;cx+=step;lineTo(cx,70+amp);}break;}
+    case 'tv':{d='M0,70';let cx=0;while(cx<W){lineTo(cx+12,30);lineTo(cx+24,110);lineTo(cx+36,70);cx+=48;}break;}
+    case 'tvpoli':{d='M0,70';let cx=0;let i=0;while(cx<W){const env=Math.abs(Math.sin(i/6))*45+8;lineTo(cx+8,70-env);lineTo(cx+16,70+env);cx+=18;i++;}break;}
+    case 'asystole':{d='M0,71 L40,71 L42,69 L46,72 L600,70.5';break;}
+    case 'aesp': for(let i=0;i<4;i++)pBeat(150,{p:5,wide:true,qrs:0.7}); break;
+    case 'afib':{d='M0,70';let cx=0;const rr=[70,55,95,60,110,75,50];let k=0;while(cx<W){for(let w=0;w<5;w++){lineTo(cx+w*4,70+(Math.random()*6-3));}cx+=20;lineTo(cx+3,76);lineTo(cx+6,30);lineTo(cx+10,82);lineTo(cx+13,70);cx+=rr[k%rr.length];k++;}break;}
+    case 'flutter':{d='M0,70';let cx=0;while(cx<W){for(let s=0;s<3;s++){lineTo(cx+6,58);lineTo(cx+12,70);cx+=12;}lineTo(cx+3,76);lineTo(cx+6,32);lineTo(cx+10,82);lineTo(cx+13,70);cx+=40;}break;}
+    case 'tsv': for(let i=0;i<14;i++)pBeat(42,{p:0,t:6}); break;
+    case 'bav1': for(let i=0;i<5;i++)pBeat(120,{pr:0.34,p:9}); break;
+    case 'mobitz1':{d='M0,70';let cx=0;const prs=[0.16,0.24,0.34,0.44];for(let i=0;i<4;i++){x=cx;pBeat(110,{pr:prs[i],p:9});cx=x;}lineTo(cx+15,70);lineTo(cx+22,61);lineTo(cx+29,70);lineTo(cx+45,70);cx+=45;x=cx;for(let i=0;i<2;i++){pBeat(110,{pr:0.16,p:9});cx=x;}break;}
+    case 'mobitz2':{d='M0,70';let cx=0;x=0;const pattern=[1,1,0,1,1,0,1];for(let i=0;i<pattern.length;i++){if(pattern[i]===1){pBeat(80,{pr:0.16,p:9});cx=x;}else{lineTo(cx+12,70);lineTo(cx+18,61);lineTo(cx+24,70);lineTo(cx+40,70);cx+=40;x=cx;}}break;}
+    case 'bav3':{d='M0,70';let cx=0;const Pinterval=55;while(cx<W){lineTo(cx+8,70);lineTo(cx+13,63);lineTo(cx+18,70);if(cx%140<60){lineTo(cx+30,76);lineTo(cx+42,34);lineTo(cx+54,80);lineTo(cx+64,70);}cx+=70;}break;}
+    default: for(let i=0;i<6;i++)pBeat(100);
+  }
+  return d;
+}
+
+// ============ RHYTHM DATABASE ============
+const rhythms=[
+  {id:'sinus',name:'Ritmo Sinusal Normal',cat:'normal',catLabel:'NORMAL',hr:'60–100',
+   crit:{Frequência:'60–100/min',Ritmo:'Regular','Onda P':'Presente, antes de cada QRS',PR:'0,12–0,20s',QRS:'Estreito (<0,12s)'},
+   theory:'Ritmo de referência. Cada onda P é seguida por um QRS estreito, com intervalos regulares. É o ritmo de comparação para reconhecer todas as anormalidades.',
+   conduct:'Nenhuma intervenção rítmica. É o objetivo após RCE ou cardioversão.',
+   pitfall:'Nunca cardioverter ritmo sinusal. Taquicardia sinusal é resposta fisiológica — tratar a causa.'},
+  {id:'fv',name:'Fibrilação Ventricular (FV)',cat:'chocavel',catLabel:'CHOCÁVEL',hr:'caótica',
+   crit:{Frequência:'Indefinível',Ritmo:'Caótico','Onda P':'Ausente',PR:'—',QRS:'Ondulações irregulares'},
+   theory:'Atividade elétrica ventricular totalmente desorganizada — sem débito cardíaco. Causa mais comum de morte súbita. Pode ser grossa (melhor prognóstico) ou fina.',
+   conduct:'DESFIBRILAÇÃO IMEDIATA + RCP alta qualidade. Epinefrina 1mg após 2º choque. Amiodarona 300mg após 3º choque. Buscar Hs e Ts.',
+   pitfall:'FV fina pode ser confundida com assístole — verifique ganho e derivação. Nunca atrasar choque para "analisar melhor".'},
+  {id:'tv',name:'Taquicardia Ventricular Monomórfica',cat:'chocavel',catLabel:'CHOCÁVEL (sem pulso) / CARDIOVERSÃO (com pulso)',hr:'150–250',
+   crit:{Frequência:'150–250/min',Ritmo:'Regular','Onda P':'Ausente ou dissociada',PR:'—',QRS:'Largo e uniforme (≥0,12s)'},
+   theory:'Três ou mais batimentos ventriculares consecutivos, QRS largos e uniformes. Pode ter pulso (estável/instável) ou ser sem pulso (TVSP = tratar como FV).',
+   conduct:'SEM PULSO: desfibrilação + algoritmo PCR. COM PULSO INSTÁVEL: cardioversão sincronizada. COM PULSO ESTÁVEL: amiodarona 150mg IV em 10 min.',
+   pitfall:'Presuma TV em toda taquicardia QRS largo até prova em contrário. Se sem pulso → protocolo FV.'},
+  {id:'tvpoli',name:'TV Polimórfica / Torsades de Pointes',cat:'chocavel',catLabel:'CHOQUE NÃO SINCRONIZADO',hr:'200–250',
+   crit:{Frequência:'200–250/min',Ritmo:'Irregular','Onda P':'Ausente',PR:'—',QRS:'Largo, amplitude variável (fuso)'},
+   theory:'QRS de morfologia e amplitude variáveis, "torcendo" em torno da linha de base. Torsades está associada a QT longo (hipomagnesemia, drogas).',
+   conduct:'INSTÁVEL → choque NÃO sincronizado. Sulfato de Mg²⁺ 1–2g IV para torsades. Corrigir QT/eletrólitos.',
+   pitfall:'NÃO tente sincronizar — morfologia variável impede sensor de identificar onda R. Tratar como FV em termos de energia.'},
+  {id:'asystole',name:'Assístole',cat:'naochocavel',catLabel:'NÃO CHOCÁVEL',hr:'0',
+   crit:{Frequência:'Ausente',Ritmo:'Linha isoelétrica','Onda P':'Ausente',PR:'—',QRS:'Ausente'},
+   theory:'Ausência total de atividade elétrica ventricular. Ritmo final de muitas paradas prolongadas. Prognóstico reservado.',
+   conduct:'RCP + Epinefrina 1mg a cada 3–5 min. NÃO desfibrilar. Buscar Hs e Ts. Considerar encerramento se refratário.',
+   pitfall:'Confirme em 2 derivações e cheque ganho/cabos. FV fina pode parecer assístole. "Flatline" pode ser cabo desconectado.'},
+  {id:'aesp',name:'Atividade Elétrica Sem Pulso (AESP)',cat:'naochocavel',catLabel:'NÃO CHOCÁVEL',hr:'variável',
+   crit:{Frequência:'Variável',Ritmo:'Organizado','Onda P':'Pode estar presente',PR:'Variável',QRS:'Qualquer morfologia'},
+   theory:'Atividade elétrica organizada SEM pulso palpável. QRS estreito+rápido sugere causa mecânica (hipovolemia, TEP, tamponamento).',
+   conduct:'RCP + Epinefrina 1mg a cada 3–5 min. TRATAMENTO É A CAUSA: revisar Hs e Ts. USG à beira do leito.',
+   pitfall:'Não desfibrilar AESP. QRS estreito → causa mecânica (volume!). QRS largo → metabólica/tóxica.'},
+  {id:'sinusbrady',name:'Bradicardia Sinusal',cat:'brady',catLabel:'BRADICARDIA',hr:'<60',
+   crit:{Frequência:'<60/min',Ritmo:'Regular','Onda P':'Normal, antes de cada QRS',PR:'Normal',QRS:'Estreito'},
+   theory:'Ritmo sinusal com FC baixa. Pode ser fisiológico (atletas) ou patológico. Tratar somente se INSTÁVEL.',
+   conduct:'Se instável: Atropina 1mg IV (máx 3mg). Se ineficaz: MPTC e/ou dopamina 5–20 mcg/kg/min ou epinefrina 2–10 mcg/min.',
+   pitfall:'Bradicardia + hipertensão pode indicar ↑pressão intracraniana (reflexo de Cushing).'},
+  {id:'bav1',name:'BAV de 1º Grau',cat:'brady',catLabel:'BLOQUEIO AV 1º',hr:'variável',
+   crit:{Frequência:'Variável',Ritmo:'Regular','Onda P':'Presente, 1:1 com QRS',PR:'Prolongado (>0,20s), FIXO',QRS:'Geralmente estreito'},
+   theory:'Atraso na condução no nó AV — todos os impulsos chegam aos ventrículos, mas com retardo. PR longo mas CONSTANTE. Geralmente benigno.',
+   conduct:'Em geral não requer tratamento. Tratar somente se associado a bradicardia sintomática.',
+   pitfall:'Isolado é benigno, mas pode evoluir. Observar se associado a IAM de parede inferior.'},
+  {id:'mobitz1',name:'BAV 2º Grau Mobitz I (Wenckebach)',cat:'brady',catLabel:'BRADICARDIA / BLOQUEIO',hr:'variável',
+   crit:{Frequência:'Variável',Ritmo:'Irregular (agrupado)','Onda P':'Presente',PR:'Aumenta progressivamente até P bloqueada',QRS:'Estreito'},
+   theory:'Prolongamento PROGRESSIVO do PR até onda P não conduzida. Geralmente no nó AV. Costuma ser benigno e responde à atropina.',
+   conduct:'Se sintomático: atropina costuma funcionar. MPTC se refratário.',
+   pitfall:'Aqui o PR ALONGA progressivamente antes de cair. Diferente do Mobitz II (PR constante).'},
+  {id:'mobitz2',name:'BAV 2º Grau Mobitz II',cat:'brady',catLabel:'ALTO RISCO',hr:'variável',
+   crit:{Frequência:'Variável',Ritmo:'Regular ou irregular','Onda P':'Algumas não conduzidas',PR:'CONSTANTE nos conduzidos',QRS:'Frequentemente largo'},
+   theory:'Ondas P periodicamente bloqueadas SEM aviso, PR constante. Bloqueio INFRANODAL. Alto risco de progressão súbita para BAV total.',
+   conduct:'NÃO confiar na atropina! Preparar MPTC imediatamente. Cronotrópicos como ponte. Estimulação transvenosa.',
+   pitfall:'Atropina pode PIORAR (acelera nó e aumenta bloqueio infranodal). MPTC em espera mesmo se assintomático com IAM.'},
+  {id:'bav3',name:'BAV de 3º Grau (Completo)',cat:'brady',catLabel:'EMERGÊNCIA',hr:'30–45 (escape)',
+   crit:{Frequência:'Atrial > Ventricular',Ritmo:'P e QRS independentes','Onda P':'Dissociada do QRS',PR:'Variável',QRS:'Estreito (juncional) ou largo (ventricular)'},
+   theory:'Dissociação AV completa — átrios e ventrículos batem independentes. O bloqueio clinicamente mais grave.',
+   conduct:'Emergência. NÃO confiar na atropina. MPTC imediato + preparar transvenosa. Dopamina/epinefrina como ponte.',
+   pitfall:'Escape QRS largo = origem ventricular baixa = mais instável. Causa frequente de colapso e marca-passo definitivo.'},
+  {id:'sinustaq',name:'Taquicardia Sinusal',cat:'taqui',catLabel:'TAQUICARDIA',hr:'100–150',
+   crit:{Frequência:'100–~150/min',Ritmo:'Regular','Onda P':'Normal, antes de cada QRS',PR:'Normal',QRS:'Estreito'},
+   theory:'Resposta fisiológica: febre, dor, hipovolemia, anemia, hipóxia. NÃO é arritmia primária.',
+   conduct:'TRATAR A CAUSA. NUNCA cardioverter taquicardia sinusal.',
+   pitfall:'Raramente ultrapassa 150/min em adultos. Se FC ≥150 regular estreita, considerar TSV.'},
+  {id:'tsv',name:'Taquicardia Supraventricular (TSV)',cat:'taqui',catLabel:'TAQUICARDIA',hr:'150–250',
+   crit:{Frequência:'150–250/min',Ritmo:'Regular','Onda P':'Ausente ou retrógrada',PR:'Não mensurável',QRS:'Estreito (<0,12s)'},
+   theory:'Taquicardia de complexo estreito por reentrada. Início e término súbitos. FC fixa e muito regular.',
+   conduct:'ESTÁVEL: manobras vagais → adenosina 6mg IV rápido+flush (depois 12mg, 12mg). INSTÁVEL: cardioversão sincronizada (50–100J).',
+   pitfall:'Adenosina: bolus ULTRA-rápido com flush imediato (meia-vida <10s). Avisar paciente.'},
+  {id:'afib',name:'Fibrilação Atrial',cat:'taqui',catLabel:'TAQUICARDIA (se rápida)',hr:'irregular',
+   crit:{Frequência:'Variável',Ritmo:'Irregularmente irregular','Onda P':'Ausente (ondas f)',PR:'Não mensurável',QRS:'Estreito'},
+   theory:'Atividade atrial caótica. Resposta ventricular irregularmente irregular. Risco de tromboembolismo.',
+   conduct:'INSTÁVEL: cardioversão sincronizada (120–200J). ESTÁVEL: controle frequência (diltiazem, β-bloqueador). Anticoagular se >48h.',
+   pitfall:'Irregularmente irregular é a marca registrada. Cardioversão em FA >48h sem anticoagulação tem risco de AVC embólico.'},
+  {id:'flutter',name:'Flutter Atrial',cat:'taqui',catLabel:'TAQUICARDIA (se rápida)',hr:'atrial ~300',
+   crit:{Frequência:'Atrial ~250–350, ventricular conforme bloqueio',Ritmo:'Geralmente regular','Onda P':'Ondas F em "dente de serra"',PR:'—',QRS:'Estreito'},
+   theory:'Macrorreentrada atrial produzindo ondas "dente de serra". Condução AV costuma ser 2:1, 3:1, 4:1.',
+   conduct:'INSTÁVEL: cardioversão sincronizada (50–100J — converte com baixa energia). ESTÁVEL: controle frequência / anticoagulação.',
+   pitfall:'Padrão dente-de-serra mais visível em DII, DIII, aVF. Converte com energias mais baixas que a FA.'},
+];
+
+// ============ ALGORITHMS ============
+const algos={
+  pcr:{title:'PCR — FV / TVSP',color:'var(--accent)',steps:[
+    {num:'1',color:'',title:'Reconhecer a PCR',content:'Sem resposta + sem pulso (verificar simultaneamente por 5–10 seg). Iniciar RCP de alta qualidade imediatamente.'},
+    {num:'2',color:'',title:'RCP de Alta Qualidade',content:'<ul><li>Compressões 100–120/min, ≥5 cm</li><li>Retorno completo do tórax</li><li>FCT máxima — interrupções ≤10 seg</li><li>Evitar hiperventilação</li><li>Trocar compressor ≤2 min</li></ul>'},
+    {num:'3',color:'blue',title:'DEA / Desfibrilador — Analisar Ritmo',content:'Conectar assim que disponível. <span class="highlight">RITMO CHOCÁVEL? (FV/TVSP) → CHOCAR!</span><br>Reiniciar RCP imediatamente após choque. Pausa pré-choque ≤10 seg.'},
+    {num:'4',color:'',title:'Acesso IV/IO + Epinefrina',content:'<b>Epinefrina 1mg IV/IO a cada 3–5 min</b><br>Administrar após 2º choque sem RCE. Flush 20mL após cada dose.'},
+    {num:'5',color:'blue',title:'Análise de Ritmo a cada 2 min',content:'Checar pulso somente se ritmo organizado. Pausa ≤10 seg.<br><b>Se chocável:</b> novo choque → RCP<br><b>Se organizado → checar pulso → RCE?</b>'},
+    {num:'6',color:'yellow',title:'Antiarrítmico (3º choque sem RCE)',content:'<b>Amiodarona 300mg IV/IO</b> (2ª dose: 150mg).<br>Alternativa: <b>lidocaína 1–1,5mg/kg IV/IO</b>'},
+    {num:'7',color:'green',title:'Via Aérea Avançada',content:'Ponderar benefício × interrupção. Com via avançada: <b>1 vent/6 seg</b> sem pausar compressões. Confirmar com capnografia de forma de onda.'},
+    {num:'8',color:'green',title:'RCE — Retorno da Circulação Espontânea',content:'Sinais: elevação súbita ETCO₂ >25mmHg, pulso palpável. → Iniciar <b>Cuidados Pós-PCR</b>'},
+  ]},
+  aesp:{title:'PCR — AESP / Assístole',color:'var(--accent4)',steps:[
+    {num:'1',color:'',title:'Reconhecer AESP ou Assístole',content:'AESP: atividade elétrica organizada sem pulso palpável.<br>Assístole: confirmar em 2 derivações, ajustar ganho.'},
+    {num:'2',color:'',title:'RCP de Alta Qualidade',content:'Idêntica ao algoritmo FV/TVSP. Compressões sem interrupção enquanto avalia causas.'},
+    {num:'3',color:'',title:'Epinefrina — 1ª oportunidade',content:'<b>Epinefrina 1mg IV/IO</b> o mais rápido possível. Repetir a cada 3–5 min. <span class="highlight blue">Não há desfibrilação — foco em RCP + causa</span>'},
+    {num:'4',color:'blue',title:'Buscar e Tratar os Hs & Ts',content:'<b>H</b>ipovolemia · <b>H</b>ipóxia · <b>H</b>⁺(acidemia) · <b>H</b>ipo/Hipercalemia · <b>H</b>ipotermia<br><b>T</b>amponamento · pneumo<b>T</b>órax · <b>T</b>oxinas · <b>T</b>EP · Trombo coronária<br><i>Tratar a causa = melhor chance de RCE</i>'},
+    {num:'5',color:'yellow',title:'Ultrassom à Beira do Leito',content:'Identificar rapidamente: tamponamento, pneumotórax, EP, hipovolemia, disfunção miocárdica.'},
+    {num:'6',color:'',title:'Análise de Ritmo a cada 2 min',content:'Se AESP/assístole persistir: continuar RCP + epinefrina + buscar causas.<br>Se ritmo chocável aparecer: via FV/TVSP.'},
+    {num:'7',color:'green',title:'RCE ou Encerramento',content:'Se RCE: cuidados pós-PCR.<br>Se sem resposta após esforço razoável sem causa reversível: considerar encerramento (NTR).'},
+  ]},
+  sca:{title:'Síndromes Coronárias Agudas',color:'var(--accent2)',steps:[
+    {num:'1',color:'yellow',title:'Reconhecer Sintomas de SCA',content:'Desconforto retroesternal, irradiação para ombros/braço/mandíbula, dispneia, náusea, sudorese. <i>Idosos, mulheres, diabéticos: sintomas atípicos frequentes.</i>'},
+    {num:'2',color:'',title:'SME: Avaliação Pré-Hospitalar',content:'<ul><li>Avaliar ABCs, preparar para RCP/desfibrilação</li><li><b>Aspirina 162–325mg mastigável</b></li><li>O₂ se SpO₂ &lt;90%</li><li>Nitroglicerina SL (se PAS >90, FC 50–100, sem inibidor PDE-5)</li><li><b>ECG 12 derivações — notificar hospital</b></li></ul>'},
+    {num:'3',color:'blue',title:'Hospital: Primeiros 10 Minutos',content:'Acionar equipe de IAMST. Acesso IV + exames + RX tórax ≤30 min. Completar checklist de fibrinolíticos.'},
+    {num:'4',color:'',title:'Classificar pelo ECG',content:'<b class="highlight">IAMST:</b> Supra ST ≥1mm em ≥2 derivações contíguas (V2–V3: ≥2mm), ou BRE novo.<br><b class="highlight blue">SCA-SSST alto risco:</b> infra ST ≥0,5mm, inversão T dinâmica, troponina elevada.'},
+    {num:'5',color:'yellow',title:'IAMST → Reperfusão',content:'<b>Preferência: ICP primária ≤90 min</b> do 1º contato médico.<br>Se transferência: ≤120 min.<br><b>Fibrinólise: ≤30 min porta-agulha</b> se ICP não disponível em 90 min.'},
+    {num:'6',color:'green',title:'Fibrinólise: Contraindicações Absolutas',content:'• AVC hemorrágico prévio (qualquer data)<br>• AVC isquêmico &lt;3 meses<br>• Neoplasia intracraniana / MAV<br>• TCE ou cirurgia crânio-facial &lt;3 meses<br>• Suspeita dissecção aórtica<br>• Sangramento ativo ou diátese hemorrágica<br>• Punção vascular não-compressível &lt;24h'},
+  ]},
+  avc:{title:'AVC Agudo — Algoritmo',color:'var(--accent3)',steps:[
+    {num:'1',color:'yellow',title:'Reconhecer (CPSS)',content:'<b>Cincinnati Prehospital Stroke Scale:</b><br>• <b>Face:</b> sorriso assimétrico<br>• <b>Braço:</b> queda de um braço com olhos fechados<br>• <b>Fala:</b> arrastada / errada / ausente<br><i>1 anormal = 72% probabilidade de AVC.</i>'},
+    {num:'2',color:'',title:'SME: Ações Críticas',content:'<ul><li>ABCs, O₂ se SpO₂ ≤94%</li><li>Glicemia — tratar hipoglicemia (&lt;60 mg/dL)</li><li>Estabelecer hora de início (última vez visto normal)</li><li>NIHSS/LAMS/RACE para suspeitar oclusão de vaso grande</li><li><b>Notificar hospital → direto para sala de TC</b></li></ul>'},
+    {num:'3',color:'blue',title:'Hospital: Primeiros 10 Minutos',content:'Acionar equipe de AVC → TC/RM sem contraste urgente → ABCs → IV → glicemia → histórico.'},
+    {num:'4',color:'',title:'TC/RM: Hemorragia?',content:'<b class="highlight">SIM — Hemorrágico:</b> NÃO dar fibrinolítico. Protocolo hemorragia IC. Avaliar neurointervenção.<br><b class="highlight green">NÃO — Isquêmico:</b> avaliar candidatura ao alteplase IV.'},
+    {num:'5',color:'green',title:'Alteplase IV',content:'Dose: <b>0,9 mg/kg IV (máx 90mg)</b> — 10% bolus em 1min + restante em 60min.<br>Janela: <b>≤3h</b> (ou ≤4,5h selecionados: sem DM, sem AVC prévio, NIHSS ≤25).<br>PA deve ser ≤185/110 antes de iniciar.'},
+    {num:'6',color:'yellow',title:'TEV (Trombectomia Mecânica)',content:'Critérios &lt;6h: rankin 0–1, oclusão ACI/ACM M1, NIHSS ≥6, ASPECTS ≥6, ≥18a.<br>6–16h: critérios DAWN ou DEFUSE-3.<br>16–24h: critérios DAWN.<br><b>Porta → dispositivo ≤90 min (direto)</b>'},
+    {num:'7',color:'',title:'Controle PA pré-alteplase',content:'PA >185/110: <b>labetalol 10–20mg IV</b> ou <b>nicardipina 5 mg/h</b> titulada.<br>Após alteplase: manter PA ≤180/105. Monitor a cada 15 min por 2h.'},
+  ]},
+  brady:{title:'Bradicardia Sintomática',color:'var(--accent4)',steps:[
+    {num:'1',color:'',title:'Identificar Bradicardia',content:'FC &lt;50/min. Aplicar monitorização, O₂ se hipóxico, acesso IV, ECG 12 derivações.'},
+    {num:'2',color:'',title:'Perfusão Adequada?',content:'<div class="decision-box blue">Sinais de instabilidade: hipotensão, alteração mental, choque, isquemia miocárdica, IC aguda.<br><b>Os sinais são causados pela bradicardia?</b></div>Sem sinais → monitorar.'},
+    {num:'3',color:'yellow',title:'1ª Linha: Atropina',content:'<b>Atropina 1mg IV</b> a cada 3–5 min. Máx: 3mg.<br><span class="highlight">Não confiar em Mobitz II ou BAV 3º grau com QRS largo!</span>'},
+    {num:'4',color:'blue',title:'Se Ineficaz: MPTC + Drogas',content:'<ul><li><b>MPTC:</b> freq 60–80/min. Confirmar captura elétrica (espícula+QRS) E mecânica (pulso). Sedar consciente.</li><li><b>Dopamina:</b> 5–20 mcg/kg/min</li><li><b>Epinefrina:</b> 2–10 mcg/min</li></ul>'},
+    {num:'5',color:'green',title:'Estimulação Transvenosa',content:'Se MPTC ineficaz ou bradicardia recorrente → especialista → transvenosa.<br><i>MPTC = ponte para transvenosa e possível marca-passo definitivo.</i>'},
+    {num:'6',color:'',title:'Bloqueios AV — Resumo',content:'<b>BAV 1º:</b> PR prolongado FIXO — benigno.<br><b>Mobitz I:</b> PR progressivamente maior → P não conduzida — geralmente responde à atropina.<br><b>Mobitz II:</b> PR CONSTANTE, P não conduzida sem aviso → ALTO RISCO, MPTC imediato.<br><b>BAV 3º:</b> dissociação AV completa → emergência.'},
+  ]},
+  taqui:{title:'Taquicardia com Pulso',color:'var(--yellow)',steps:[
+    {num:'1',color:'',title:'Avaliar Estabilidade',content:'FC >100/min. Sintomas graves geralmente com FC ≥150/min. Determinar: estável ou instável?'},
+    {num:'2',color:'',title:'Monitorar e Identificar',content:'O₂ se hipóxico, IV, ECG 12 derivações. Determinar: QRS largo (≥0,12s) ou estreito? Regular ou irregular?'},
+    {num:'3',color:'',title:'INSTÁVEL → Cardioversão Sincronizada Imediata',content:'<div class="decision-box">Instável = hipotensão, alteração mental, choque, isquemia, IC.<br><b>Sedar se consciente — mas não atrasar a cardioversão!</b></div>Exceção: <b>TV polimórfica → choque NÃO sincronizado</b>'},
+    {num:'4',color:'blue',title:'Energias para Cardioversão Sincronizada',content:'<ul><li>Fibrilação atrial: 120–200J bifásico (200J monofásico)</li><li>Flutter atrial / TSV: 50–100J</li><li>TV monomórfica regular: 100J (escalar)</li></ul>'},
+    {num:'5',color:'',title:'Estável + QRS Estreito Regular → TSV',content:'Manobras vagais → <b>Adenosina 6mg IV rápido + flush</b> (2ª: 12mg, 3ª: 12mg).<br>Se refratário: diltiazem, metoprolol.'},
+    {num:'6',color:'green',title:'Estável + QRS Estreito Irregular',content:'FA ou flutter com condução variável.<br><b>Controle frequência:</b> diltiazem, metoprolol.<br>Anticoagulação se >48h.'},
+    {num:'7',color:'yellow',title:'Estável + QRS Largo Regular',content:'Presumir TV. <b>Amiodarona 150mg IV em 10 min</b>. Máx 2,2g/24h.<br>Alternativa: procainamida, sotalol.'},
+    {num:'8',color:'',title:'Estável + QRS Largo Irregular',content:'FA com aberrância ou pré-excitação.<br><b>Evitar adenosina, diltiazem, verapamil em WPW.</b> Consultar especialista.'},
+  ]},
+  pospcr:{title:'Cuidados Pós-PCR',color:'var(--accent3)',steps:[
+    {num:'1',color:'',title:'Via Aérea e Ventilação',content:'Via aérea avançada se necessário.<br><b>SpO₂ alvo: 92–98%</b> (evitar hiperóxia).<br>ETCO₂ alvo: 35–40 mmHg. Evitar hiperventilação.'},
+    {num:'2',color:'blue',title:'Hemodinâmica',content:'<b>PAS ≥90 mmHg</b> (ou PAM ≥65).<br>Fluidos + vasopressores (noradrenalina) se necessário.<br>ECG urgente → IAMST? → ICP imediata.'},
+    {num:'3',color:'yellow',title:'Controle Direcionado de Temperatura (CDT)',content:'Para inconscientes após RCE:<br><b>32–36°C por 24h</b>.<br>Tratar febre ativamente (>37,7°C é prejudicial).'},
+    {num:'4',color:'',title:'Glicemia e Outros',content:'Glicemia alvo: <b>144–180 mg/dL</b> (evitar hipoglicemia &lt;70).<br>Tratar convulsões. Corrigir K⁺, Mg²⁺, Ca²⁺.'},
+    {num:'5',color:'green',title:'Neuroprognóstico',content:'<b>Não prognosticar antes de 72h após CDT</b>.<br>Abordagem multimodal: exame clínico, EEG, SSEP, TC/RM, NSE/S100B.<br>Equipe multidisciplinar.'},
+    {num:'6',color:'',title:'Síndrome Pós-PCR',content:'4 componentes:<ul><li>Lesão cerebral pós-PCR</li><li>Disfunção miocárdica pós-PCR</li><li>Isquemia/reperfusão sistêmica</li><li>Patologia precipitante persistente</li></ul>UTI multidisciplinar.'},
+  ]},
+};
+
+// ============ FLASHCARDS ============
+const allCards=[
+  // PCR
+  {deck:'pcr',q:'Qual é a frequência ideal de compressões torácicas?',a:'100–120/min. Abaixo de 100 é insuficiente; acima de 120 reduz o enchimento ventricular.'},
+  {deck:'pcr',q:'Qual a profundidade alvo das compressões em adultos?',a:'Pelo menos 5 cm (≥5 cm), sem exceder 6 cm. >6 cm pode causar lesões sem benefício adicional.'},
+  {deck:'pcr',q:'Tempo máximo de interrupção das compressões?',a:'10 segundos ou menos. Cada segundo reduz a pressão de perfusão coronária drasticamente.'},
+  {deck:'pcr',q:'Quando administrar epinefrina na FV/TVSP?',a:'Após o 2º choque sem RCE. Dose: 1mg IV/IO a cada 3–5 min.'},
+  {deck:'pcr',q:'Dose e momento da amiodarona na FV refratária?',a:'Após 3º choque sem RCE: 300mg IV/IO. 2ª dose: 150mg. Alternativa: lidocaína 1–1,5 mg/kg.'},
+  {deck:'pcr',q:'O que é FCT (Fração de Compressões Torácicas)?',a:'Proporção do tempo de RCP em que compressões estão sendo realizadas. Alvo >60%. Quanto mais alta, melhor o débito cardíaco.'},
+  {deck:'pcr',q:'ETCO₂ persistentemente <10 mmHg durante RCP indica o quê?',a:'Baixo débito cardíaco (má qualidade de RCP). Melhorar frequência/profundidade das compressões.'},
+  {deck:'pcr',q:'Elevação súbita do ETCO₂ >25 mmHg indica o quê?',a:'Possível RCE. Verificar pulso e ritmo. Não interromper compressões sem evidência objetiva.'},
+  {deck:'pcr',q:'Quais os dois ritmos chocáveis na PCR?',a:'Fibrilação Ventricular (FV) e Taquicardia Ventricular Sem Pulso (TVSP). Exigem desfibrilação imediata.'},
+  {deck:'pcr',q:'O que é AESP?',a:'Atividade Elétrica Sem Pulso — atividade elétrica organizada no ECG sem pulso palpável. RCP + buscar causas reversíveis.'},
+  {deck:'pcr',q:'Frequência de ventilação com via aérea avançada inserida?',a:'1 ventilação a cada 6 segundos (10/min), de forma contínua SEM pausar compressões.'},
+  {deck:'pcr',q:'PPC mínima necessária para RCE?',a:'≥15 mmHg. A cada interrupção das compressões a PPC cai rapidamente.'},
+  // SCA
+  {deck:'sca',q:'Tempo porta-balão alvo no IAMST?',a:'≤90 minutos do 1º contato médico. Se transferência: ≤120 min.'},
+  {deck:'sca',q:'Tempo porta-agulha para fibrinolítico?',a:'≤30 minutos (se ICP não disponível em 90 min).'},
+  {deck:'sca',q:'Como definir IAMST no ECG?',a:'Supra ST ≥1mm em ≥2 derivações contíguas (V2–V3: ≥2mm; mulheres: ≥1,5mm) OU BRE novo.'},
+  {deck:'sca',q:'Quais são os "4 Ds" hospitalares do IAMST?',a:'Porta (Door) · Dados (ECG) · Decisão · Drogas/Dispositivo. Pontos onde ocorrem atrasos a minimizar.'},
+  {deck:'sca',q:'Por que nitroglicerina é contraindicada no infarto de VD?',a:'VD é dependente de pré-carga. Nitroglicerina reduz pré-carga → hipotensão grave e colapso hemodinâmico.'},
+  {deck:'sca',q:'Contraindicação da nitroglicerina com inibidores de PDE-5?',a:'Sildenafil/vardenafil nas últimas 24h, ou tadalafil nas últimas 48h. Combinação causa hipotensão refratária grave.'},
+  {deck:'sca',q:'Contraindicações absolutas aos fibrinolíticos no IAMST?',a:'AVC hemorrágico prévio · AVC isquêmico <3 meses · Neoplasia intracraniana/MAV · TCE ou cirurgia crânio-facial <3 meses · Suspeita de dissecção aórtica · Sangramento ativo · Punção vascular não-compressível <24h'},
+  // AVC
+  {deck:'avc',q:'Quais os 3 itens da CPSS (Cincinnati)?',a:'1. Paralisia facial (assimetria ao sorrir)\n2. Queda do braço (olhos fechados)\n3. Fala anormal\nUM anormal = 72% de probabilidade de AVC.'},
+  {deck:'avc',q:'Janela temporal para alteplase IV no AVC isquêmico?',a:'≤3h para a maioria. Selecionados (sem DM, sem AVC prévio, NIHSS ≤25, sem anticoagulação): ≤4,5h.'},
+  {deck:'avc',q:'Dose do alteplase no AVC isquêmico?',a:'0,9 mg/kg IV (máximo 90mg). 10% bolus em 1 min; restante em 60 min.'},
+  {deck:'avc',q:'PA máxima para iniciar alteplase?',a:'PAS ≤185 mmHg E PAD ≤110 mmHg. Se PA alta: labetalol 10–20mg IV ou nicardipina 5mg/h.'},
+  {deck:'avc',q:'Quais os 8 Ds do AVC?',a:'Detecção → Despacho → Delivery → Porta → Dados (TC) → Decisão → Drugs/Dispositivo → Disponibilização (UTI)'},
+  {deck:'avc',q:'Percentual isquêmico vs hemorrágico?',a:'87% isquêmico / 13% hemorrágico. TC/RM é o passo crítico para distinguir.'},
+  {deck:'avc',q:'Critérios para TEV (trombectomia) em <6h?',a:'NIHSS ≥6 · ASPECTS ≥6 · Rankin pré-AVC 0–1 · Oclusão ACI ou ACM M1 · Idade ≥18 · Porta → dispositivo ≤90 min'},
+  // BRADICARDIA
+  {deck:'brady',q:'Definição de bradicardia instável para tratamento?',a:'3 critérios: FC lenta (<50/min) + sintomas + sintomas CAUSADOS pela FC lenta.'},
+  {deck:'brady',q:'1ª linha para bradicardia instável?',a:'Atropina 1mg IV a cada 3–5 min. Máx: 3mg. Doses <0,5mg podem piorar a bradicardia.'},
+  {deck:'brady',q:'Em quais bloqueios AV a atropina NÃO deve ser confiada?',a:'Mobitz II e BAV 3º grau com QRS largo. Bloqueio infranodal — atropina age no nó AV, não resolve. Usar MPTC.'},
+  {deck:'brady',q:'Diferença Mobitz I vs Mobitz II?',a:'Mobitz I: PR se prolonga progressivamente → P bloqueada (nodal, benigno, responde atropina).\nMobitz II: PR constante, P bloqueada sem aviso (infranodal, risco de BAV completo súbito, MPTC imediato).'},
+  {deck:'brady',q:'Frequência alvo ao iniciar MPTC?',a:'60–80/min. Confirmar captura elétrica (espícula + QRS) E mecânica (pulso palpável). Sedar consciente.'},
+  {deck:'brady',q:'Doses de dopamina e epinefrina na bradicardia?',a:'Dopamina: 5–20 mcg/kg/min IV. Epinefrina: 2–10 mcg/min IV.'},
+  // TAQUICARDIA
+  {deck:'taqui',q:'Em que FC a taquicardia geralmente causa instabilidade?',a:'FC ≥150/min. Abaixo de 150/min, sintomas provavelmente têm outra causa.'},
+  {deck:'taqui',q:'Tratamento da TV polimórfica instável?',a:'Choque NÃO sincronizado com energia de desfibrilação. Não tente sincronizar. Sulfato de Mg²⁺ 1–2g para torsades.'},
+  {deck:'taqui',q:'Diferença choque sincronizado vs não sincronizado?',a:'Sincronizado: choque no pico da onda R (evita período vulnerável T). Para pacientes COM pulso e ritmo organizado.\nNão sincronizado: qualquer momento. Para PCR (FV/TVSP) ou TV polimórfica.'},
+  {deck:'taqui',q:'1ª linha para TSV estável?',a:'Manobras vagais. Se ineficaz: adenosina 6mg IV rápido + flush. 2ª dose: 12mg. 3ª: 12mg.'},
+  {deck:'taqui',q:'Energias cardioversão sincronizada por ritmo?',a:'FA: 120–200J bifásico (200J monofásico). Flutter/TSV: 50–100J. TV monomórfica: 100J (escalar).'},
+  // PÓS-PCR
+  {deck:'pospcr',q:'Meta de SpO₂ pós-PCR?',a:'92–98%. Evitar hiperóxia (>98% pode ser lesiva) e hipóxia.'},
+  {deck:'pospcr',q:'Temperatura alvo no CDT?',a:'32–36°C por 24h em inconscientes após RCE. Tratar febre (>37,7°C) ativamente.'},
+  {deck:'pospcr',q:'4 componentes da síndrome pós-PCR?',a:'1. Lesão cerebral pós-PCR\n2. Disfunção miocárdica pós-PCR\n3. Isquemia sistêmica / reperfusão\n4. Patologia precipitante persistente'},
+  {deck:'pospcr',q:'Quando fazer ICP no pós-PCR?',a:'ICP emergencial em pós-RCE com IAMST no ECG — independente do estado de consciência.'},
+  {deck:'pospcr',q:'Quando iniciar neuroprognóstico?',a:'Não antes de 72h após CDT. Abordagem multimodal: exame clínico, EEG, SSEP, neuroimagem, NSE/S100B.'},
+  {deck:'pospcr',q:'Meta glicêmica no pós-PCR?',a:'144–180 mg/dL. Hipoglicemia (<70) é tão prejudicial quanto hiperglicemia ao cérebro lesionado.'},
+  // FARMACOLOGIA
+  {deck:'farma',q:'Por que doses de atropina <0,5mg são perigosas?',a:'Podem causar efeito parassimpático central e desacelerar ainda mais a FC. Dose mínima recomendada: 1mg IV.'},
+  {deck:'farma',q:'Mecanismo da adenosina na TSV?',a:'Bloqueia temporariamente a condução no nó AV (meia-vida <10s). Reverte TSV com circuito de reentrada nodal. Pode causar assistolia transitória.'},
+  {deck:'farma',q:'Risco específico da morfina no SCA-SSST?',a:'Associada a maior mortalidade no SCA-SSST. Reduz absorção de antiplaquetários orais. Usar com cautela.'},
+  {deck:'farma',q:'Principal efeito adverso do alteplase no AVC?',a:'Hemorragia intracraniana sintomática — o mais grave. Outras: hemorragias sistêmicas, angioedema.'},
+  {deck:'farma',q:'Indicação do sulfato de magnésio na PCR?',a:'FV refratária por hipomagnesemia documentada, ou Torsades de Pointes. Dose: 1–2g IV.'},
+  // SISTEMAS
+  {deck:'sistemas',q:'6 elos da Cadeia de Sobrevivência PCREH?',a:'1. Reconhecimento e ativação do SME\n2. RCP imediata de alta qualidade\n3. Desfibrilação imediata\n4. SAVC básico e avançado\n5. Cuidados avançados pós-PCR\n6. Recuperação / reabilitação'},
+  {deck:'sistemas',q:'Diferença principal PCRIH vs PCREH?',a:'PCRIH: 1º elo = Vigilância e Prevenção (identifica deterioração ANTES da parada). PCREH: começa com o reconhecimento. Hospital tem mais recursos mas deve prevenir a PCR.'},
+  {deck:'sistemas',q:'O que é MCQ nos sistemas de emergência?',a:'Melhoria Contínua da Qualidade — coleta e análise de dados (FCT, ETCO₂, taxas RCE) para identificar lacunas e implementar melhorias sistêmicas.'},
+  {deck:'sistemas',q:'O que o SAMPLE avalia na anamnese secundária?',a:'S-Sinais/sintomas · A-Alergias · M-Medicações · P-Passado médico · L-Última ingesta · E-Eventos que levaram ao quadro'},
+  {deck:'sistemas',q:'O que a letra D do ABCDE avalia?',a:'Disability (disfunção neurológica): AVDI (Alerta/Voz/Dor/Irresponsivo), Glasgow, pupilas, glicemia capilar.'},
+  // VIA AÉREA
+  {deck:'via_aerea',q:'COA vs CNF — quando usar cada uma?',a:'COA: apenas inconscientes sem reflexo de gag.\nCNF: pode usar em semi-conscientes ou com trismo — menos estímulo ao vômito.'},
+  {deck:'via_aerea',q:'5 métodos para confirmar posição do tubo orotraqueal?',a:'1. Expansão bilateral do tórax\n2. Ausculta epigástrica (ausência)\n3. Ausculta bilateral (presença)\n4. Capnografia de forma de onda (CONFIRMATÓRIO)\n5. Radiografia de tórax (definitivo)'},
+  {deck:'via_aerea',q:'Papel da capnografia de forma de onda na RCP?',a:'Confirma posição do tubo + monitora qualidade RCP (alvo >10 mmHg) + detecta RCE (elevação súbita >25 mmHg) + guia ventilação pós-RCE (35–40 mmHg).'},
+  {deck:'via_aerea',q:'Vantagem da via aérea avançada sobre BVM 30:2?',a:'Com via avançada: 1 vent/6 seg sem pausar compressões → FCT máxima. Com BVM 30:2: pausas a cada 30 compressões reduzem FCT.'},
+  // SITUAÇÕES ESPECIAIS
+  {deck:'sit_esp',q:'Regra fundamental para PCR em hipotermia acidental?',a:'"Não está morto até estar quente e morto." Continuar RCP até reaquecimento ≥32–35°C. Hipocalemia grave (K⁺ >12 mEq/L) prediz morte irreversível.'},
+  {deck:'sit_esp',q:'Abaixo de qual temperatura não desfibrilar em hipotermia?',a:'Abaixo de 30°C: até 1–3 tentativas. Se sem resposta, focar no reaquecimento (idealmente RCPEC). O miocárdio hipotérmico raramente reverte.'},
+  {deck:'sit_esp',q:'Prioridade no tratamento de overdose de opioides com apneia?',a:'VENTILAÇÃO com BVM — a causa de morte é apneia. Naloxona 0,4–2mg IV/IO/IM/IN é adjunto importante, mas a oxigenação vem primeiro.'},
+  {deck:'sit_esp',q:'2 ações específicas na PCR de gestante ≥20 semanas?',a:'1. Deslocamento uterino esquerdo MANUAL durante RCP (alivia compressão aortocava).\n2. Cesariana de emergência em ≤5 min se sem RCE (pode salvar mãe e feto).'},
+  {deck:'sit_esp',q:'Principais indicações de RCPEC?',a:'PCR refratária sem causa reversível · Hipotermia profunda · Intoxicação grave (β-bloqueadores, BCCa) · EP maciça · PCR em sala de hemodinâmica'},
+  // EQUIPES
+  {deck:'equipes',q:'6 papéis funcionais em equipe SAVC de alto desempenho?',a:'1. Líder da equipe\n2. Compressor\n3. Manejo via aérea\n4. Monitor/desfibrilador\n5. Acesso IV/IO e medicamentos\n6. Temporizador/registrador'},
+  {deck:'equipes',q:'O que é comunicação com "alça fechada" (closed-loop)?',a:'1. Líder nomeia e dá ordem clara\n2. Receptor repete em voz alta\n3. Líder confirma\nElimina ambiguidade. Sem isso, ordens ficam "no ar".'},
+  {deck:'equipes',q:'Elementos de uma equipe de alto desempenho?',a:'Liderança clara · Responsabilidades distribuídas · Alça fechada · Mensagens respeitosas · Conhecimento situacional · Distribuição de carga · Solicitar/oferecer ajuda · Debriefing'},
+];
+
+// ============ QUIZ ============
+const quizQuestions=[
+  {q:'Frequência de compressões torácicas na RCP de alta qualidade?',opts:['80–100/min','100–120/min','120–150/min','Qualquer frequência vigorosa'],correct:1,exp:'100–120/min. Abaixo de 100 é insuficiente; acima de 120 reduz o enchimento ventricular e eficácia.'},
+  {q:'Tempo máximo aceitável para interrupção das compressões?',opts:['5 segundos','10 segundos','15 segundos','30 segundos'],correct:1,exp:'10 segundos. Cada interrupção reduz dramaticamente a pressão de perfusão coronária.'},
+  {q:'PCR com FV refratária após 3 choques + epinefrina. Qual medicamento?',opts:['Atropina 1mg IV','Amiodarona 300mg IV/IO','Lidocaína 3mg/kg','Adenosina 6mg IV'],correct:1,exp:'Amiodarona 300mg IV/IO após o 3º choque. Lidocaína é alternativa se amiodarona indisponível.'},
+  {q:'Tempo porta-balão alvo no IAMST com ICP?',opts:['≤60 min','≤90 min','≤120 min','≤30 min'],correct:1,exp:'≤90 min do 1º contato médico à insuflação do balão. Com transferência: ≤120 min.'},
+  {q:'Em qual situação a atropina NÃO deve ser confiada na bradicardia?',opts:['Bradicardia sinusal com hipotensão','BAV 1º grau sintomático','BAV 3º grau com QRS largo','Bradicardia por hipóxia'],correct:2,exp:'BAV 3º grau com QRS largo (e Mobitz II): bloqueio infranodal. Atropina age no nó AV e não resolve. MPTC imediato.'},
+  {q:'A CPSS (Cincinnati) inclui:',opts:['Consciência, pupila e motor','Face, braço e fala','Face, braço e força prensil','Pupila, fala e sensibilidade'],correct:1,exp:'Face (assimetria) + Braço (queda) + Fala (arrastada/errada/ausente). 1 anormal = 72% de probabilidade de AVC.'},
+  {q:'Dose do alteplase no AVC isquêmico agudo?',opts:['0,5 mg/kg, máx 50mg','1mg/kg, máx 100mg','0,9 mg/kg, máx 90mg','2mg/kg em bolus'],correct:2,exp:'0,9 mg/kg IV (máx 90mg): 10% bolus em 1 min, restante em 60 min.'},
+  {q:'Janela temporal para alteplase IV no AVC (maioria dos pacientes)?',opts:['≤1h','≤3h','≤6h','≤12h'],correct:1,exp:'≤3h para a maioria. Selecionados (sem DM, sem AVC prévio, NIHSS ≤25): até ≤4,5h.'},
+  {q:'Taquicardia QRS largo 180/min + hipotensão + confusão. Conduta imediata?',opts:['Adenosina 6mg IV','Amiodarona 150mg IV em 10min','Cardioversão sincronizada imediata','Manobra vagal'],correct:2,exp:'Taquicardia INSTÁVEL: cardioversão sincronizada imediata. Sedar se possível, sem atrasar. Presumir TV.'},
+  {q:'TV polimórfica instável (torsades) deve ser tratada com:',opts:['Cardioversão sincronizada','Choque não sincronizado de alta energia','Adenosina 12mg IV','Lidocaína bolus'],correct:1,exp:'TV polimórfica: choque NÃO sincronizado. Sulfato de Mg²⁺ 1–2g IV também indicado.'},
+  {q:'Duas causas mais comuns de AESP?',opts:['Hipercalemia e acidose','Hipovolemia e hipóxia','Tamponamento e pneumotórax','EP e IAMST'],correct:1,exp:'Hipovolemia e hipóxia são as mais frequentes. Sempre iniciar avaliação por elas.'},
+  {q:'Meta de temperatura no CDT pós-PCR?',opts:['28–32°C por 12h','32–36°C por 24h','36–37°C por 48h','37–38°C por 12h'],correct:1,exp:'32–36°C por 24h em inconscientes após RCE. Febre >37,7°C é ativamente deletéria.'},
+  {q:'Nitroglicerina é CONTRAINDICADA em qual situação de SCA?',opts:['IAMST parede anterior','PAS de 130 mmHg','Infarto de VD','FC de 90/min'],correct:2,exp:'No infarto de VD, nitroglicerina reduz a pré-carga → colapso hemodinâmico grave. Também CI com inibidores PDE-5 recentes.'},
+  {q:'Meta de SpO₂ nos cuidados pós-PCR?',opts:['100%','92–98%','80–85%','>99%'],correct:1,exp:'92–98%. Hiperóxia (>98%) é lesiva ao cérebro e coração lesionados.'},
+  {q:'Qual ação específica na PCR de gestante ≥20 semanas?',opts:['Suspender compressões para checar BCF','Deslocamento uterino esquerdo manual durante RCP','Sulfato de magnésio imediatamente','Intubar antes de iniciar compressões'],correct:1,exp:'O útero comprime a VCI. Deslocamento uterino esquerdo manual melhora o retorno venoso e o débito durante RCP.'},
+  {q:'Prioridade no tratamento de overdose de opioides com apneia?',opts:['Naloxona 2mg IN imediatamente','Ventilação com bolsa-máscara','Epinefrina IV','Cardioversão elétrica'],correct:1,exp:'Apneia é o mecanismo da morte. Ventilação com BVM vem ANTES da naloxona. A naloxona é adjunto.'},
+  {q:'Em hipotermia grave (<30°C) com PCR, qual abordagem para desfibrilação?',opts:['Desfibrilar normalmente sem limitações','Nunca desfibrilar — só aquecimento passivo','Até 3 choques, depois focar no reaquecimento','Dobrar a energia do choque'],correct:2,exp:'Abaixo de 30°C: até 1–3 tentativas de choque; depois priorizar reaquecimento ativo (idealmente RCPEC). "Quente e morto."'},
+  {q:'O que confirma a captura MECÂNICA durante MPTC?',opts:['Espículas visíveis no ECG','QRS largo após cada espícula','Pulso palpável correspondente a cada espícula','Elevação da PA'],correct:2,exp:'Captura elétrica = espícula + QRS. Captura mecânica = pulso palpável. Ambas devem ser confirmadas.'},
+  {q:'Comunicação "alça fechada" correta durante RCP:',opts:['Líder: "Alguém dê epinefrina"','Líder nomeia → receptor repete → líder confirma','Qualquer membro pode ordenar medicamentos','O registrador grita "epinefrina!" a cada 3–5 min'],correct:1,exp:'Alça fechada: ordem com destinatário nomeado + receptor repete + líder confirma. Elimina ambiguidade.'},
+  {q:'ETCO₂ alvo na ventilação após RCE?',opts:['<20 mmHg','35–40 mmHg','50–60 mmHg','>45 mmHg'],correct:1,exp:'35–40 mmHg (normocapnia). Hipocapnia (<35) causa vasoconstrição cerebral. Hiperventilação é deletéria.'},
+  {q:'Cânula nasofaríngea (CNF) pode ser usada em qual situação que a COA não pode?',opts:['Paciente em PCR confirmada','Semi-consciente com trismo ou reflexo de gag','Criança abaixo de 1 ano','Obstrução por corpo estranho'],correct:1,exp:'COA só em inconscientes sem reflexo de gag. CNF: tolerada em semi-conscientes — menos estímulo ao vômito.'},
+  {q:'O que é MCQ em sistemas de atendimento cardiovascular?',opts:['Monitorização Cardíaca de Qualidade','Melhoria Contínua da Qualidade — coleta de dados para otimizar sistemas','Manual de Condutas Qualificadas','Método Clínico Qualificado'],correct:1,exp:'MCQ = Melhoria Contínua da Qualidade. Coleta/análise de dados (FCT, ETCO₂, taxas RCE/sobrevida) para melhorar o sistema.'},
+  {q:'O que a letra D avalia no ABCDE?',opts:['Débito cardíaco e diurese','Disability — neurológico (AVDI, Glasgow, glicemia)','Drogas em uso','Desidratação'],correct:1,exp:'D = Disability (disfunção neurológica): AVDI, Glasgow, pupilas e glicemia capilar.'},
+  {q:'Critérios mínimos para TEV no AVC isquêmico <6h?',opts:['NIHSS ≥3, ASPECTS ≥4, qualquer vaso','NIHSS ≥6, ASPECTS ≥6, oclusão ACI/ACM M1','NIHSS ≥10, qualquer oclusão','Apenas janela temporal é critério'],correct:1,exp:'NIHSS ≥6 + ASPECTS ≥6 + oclusão ACI/ACM M1 + Rankin pré-AVC 0–1 + idade ≥18. Todos os critérios devem ser reunidos.'},
+  {q:'Qual é a cadeia de sobrevivência PCRIH que NÃO existe na PCREH?',opts:['Desfibrilação imediata','Vigilância e Prevenção','Cuidados pós-PCR','RCP de alta qualidade'],correct:1,exp:'A PCRIH adiciona Vigilância e Prevenção como 1º elo — o hospital deve identificar deterioração ANTES da PCR.'},
+  {q:'PPC mínima para que o RCE ocorra durante a RCP?',opts:['5 mmHg','15 mmHg','30 mmHg','50 mmHg'],correct:1,exp:'≥15 mmHg de PPC. Interrupções causam queda rápida da PPC e reduzem a chance de sucesso.'},
+];
+
+// ============ MEGACODE CASES ============
+const megacases=[
+  {title:'Caso 1 — FV',steps:[
+    {vitals:[['Consciência','Inconsciente','bad'],['Pulso','Ausente','bad'],['Ritmo','? a definir','warn']],narrative:'Homem 58a com dor torácica há 30 min sofre colapso. Não responde a estímulos.',prompt:'Qual sua PRIMEIRA ação?',opts:[{t:'Verificar responsividade, chamar ajuda, checar pulso e respiração (≤10s)',ok:true},{t:'Administrar epinefrina 1mg IV imediatamente',ok:false},{t:'Intubar antes de tudo',ok:false},{t:'Aplicar choque às cegas',ok:false}],exp:'Sempre AVALIAR primeiro: responsividade → acionar emergência/pedir DEA → checar pulso e respiração ≤10s. Sem pulso = iniciar RCP.'},
+    {vitals:[['Pulso','Ausente','bad'],['RCP','Em curso','warn'],['Monitor','FV','bad']],narrative:'Sem pulso. RCP iniciada. Monitor mostra FIBRILAÇÃO VENTRICULAR.',prompt:'Conduta imediata?',opts:[{t:'Desfibrilar imediatamente e retomar RCP logo após',ok:true},{t:'Epinefrina antes de qualquer choque',ok:false},{t:'Amiodarona 300mg primeiro',ok:false},{t:'Checar pulso 30s antes de decidir',ok:false}],exp:'FV é CHOCÁVEL. Desfibrilação imediata + RCP por 2 min logo após. Não checar pulso imediatamente após choque.'},
+    {vitals:[['Ritmo','FV persiste','bad'],['Choques','1 aplicado','warn'],['Acesso','IV obtido','']],narrative:'Após 1º choque e 2 min de RCP, FV persiste. 2º choque aplicado.',prompt:'Qual medicamento agora?',opts:[{t:'Epinefrina 1mg IV/IO, repetir a cada 3–5 min',ok:true},{t:'Atropina 1mg IV',ok:false},{t:'Adenosina 6mg IV',ok:false},{t:'Bicarbonato empírico',ok:false}],exp:'Epinefrina 1mg IV/IO após o 2º choque, repetida a cada 3–5 min. Atropina e adenosina não têm papel na FV.'},
+    {vitals:[['Ritmo','FV refratária','bad'],['Choques','3 aplicados','warn'],['Epinefrina','Administrada','']],narrative:'FV persiste após 3º choque e epinefrina.',prompt:'Próximo medicamento?',opts:[{t:'Amiodarona 300mg IV/IO (2ª dose 150mg)',ok:true},{t:'Dose dobrada de epinefrina (2mg)',ok:false},{t:'Magnésio de rotina',ok:false},{t:'Suspender — caso perdido',ok:false}],exp:'Amiodarona 300mg IV/IO após 3º choque (FV/TVSP refratária). 2ª dose: 150mg. Alternativa: lidocaína.'},
+    {vitals:[['ETCO₂','Súbito 38 mmHg','warn'],['Ritmo','Organizado','warn'],['Pulso','? checar','warn']],narrative:'ETCO₂ sobe subitamente de 12 → 38 mmHg. Monitor mostra ritmo organizado.',prompt:'O que isso sugere e o que fazer?',opts:[{t:'Possível RCE — checar pulso; se presente, iniciar cuidados pós-PCR',ok:true},{t:'Ignorar e continuar choques',ok:false},{t:'Aumentar profundidade das compressões',ok:false},{t:'Mais amiodarona',ok:false}],exp:'Elevação súbita ETCO₂ >25 mmHg + ritmo organizado sugere RCE. Checar pulso → pós-PCR: SpO₂ 92–98%, PA, ECG (IAMST?), CDT.'},
+  ]},
+  {title:'Caso 2 — AESP',steps:[
+    {vitals:[['Consciência','Inconsciente','bad'],['Pulso','Ausente','bad'],['Monitor','Ritmo organizado estreito','warn']],narrative:'Mulher 44a, pós-operatório recente. Sem resposta, sem pulso. Monitor: ritmo organizado complexo estreito rápido.',prompt:'Como classificar e iniciar?',opts:[{t:'AESP — RCP + epinefrina 1mg, buscar causas reversíveis',ok:true},{t:'Desfibrilar imediatamente',ok:false},{t:'Cardioverter sincronizado',ok:false},{t:'Apenas observar o ritmo',ok:false}],exp:'Atividade elétrica organizada SEM pulso = AESP (não chocável). RCP + epinefrina + Hs e Ts. QRS estreito+rápido → causa mecânica.'},
+    {vitals:[['Pulso','Ausente','bad'],['RCP','Em curso','warn'],['QRS','Estreito e rápido','warn']],narrative:'QRS estreito e rápido em pós-operatória aponta para causa mecânica.',prompt:'Causa mais provável e tratamento?',opts:[{t:'Hipovolemia (hemorragia pós-op) — infusão rápida de volume',ok:true},{t:'Hipercalemia — gluconato de cálcio',ok:false},{t:'Hipotermia — reaquecimento',ok:false},{t:'Trombose coronária — ICP imediata',ok:false}],exp:'QRS estreito + taquicardia em AESP → causa mecânica, mais comum: hipovolemia. Em pós-op, suspeitar hemorragia oculta. Volume! (QRS largo → metabólica/tóxica como hipercalemia.)'},
+    {vitals:[['Pulso','Ausente','bad'],['USG','Disponível','']],narrative:'Há ultrassom à beira do leito disponível.',prompt:'Como o USG ajuda na AESP?',opts:[{t:'Identifica tamponamento, pneumotórax, TEP, hipovolemia e disfunção miocárdica',ok:true},{t:'Substitui as compressões',ok:false},{t:'Confirma morte cerebral',ok:false},{t:'Mede temperatura central',ok:false}],exp:'USG à beira do leito identifica causas reversíveis (Hs e Ts mecânicos) sem interromper RCP por >10s.'},
+    {vitals:[['Volume','Reposto',''],['Pulso','Presente!',''],['PA','88/54','warn']],narrative:'Após reposição volêmica, retorno de pulso. PA 88/54, ainda inconsciente.',prompt:'Conduta pós-RCE?',opts:[{t:'Cuidados pós-PCR: PA (alvo PAS≥90), SpO₂ 92–98%, CDT',ok:true},{t:'Alta para enfermaria',ok:false},{t:'Suspender monitorização',ok:false},{t:'Hiperventilar para proteção cerebral',ok:false}],exp:'Pós-RCE: hemodinâmica (PAS≥90/PAM≥65), SpO₂ 92–98%, ECG, CDT 32–36°C em inconscientes. Evitar hiperventilação.'},
+  ]},
+  {title:'Caso 3 — Bradicardia',steps:[
+    {vitals:[['Consciência','Confuso','warn'],['FC','38/min','bad'],['PA','78/40','bad']],narrative:'Idoso 72a com síncope. FC 38, PA 78/40, confuso, pele fria.',prompt:'Primeira avaliação e classificação?',opts:[{t:'Bradicardia instável — via aérea, O₂, monitor, IV, ECG 12 derivações',ok:true},{t:'Cardioverter imediatamente',ok:false},{t:'Observar — FC baixa é normal em idosos',ok:false},{t:'Desfibrilar',ok:false}],exp:'FC lenta + hipotensão + alteração mental causados pela bradicardia = INSTÁVEL. Avaliação primária + preparar tratamento.'},
+    {vitals:[['FC','38/min','bad'],['ECG','BAV 3º grau, QRS largo','bad']],narrative:'ECG: BAV 3º grau com escape ventricular QRS largo.',prompt:'Tratamento de 1ª linha — e ressalva?',opts:[{t:'Atropina pode ser tentada, MAS preparar MPTC (atropina costuma falhar no BAV 3º/QRS largo)',ok:true},{t:'Confiar na atropina até 3mg antes de qualquer outra medida',ok:false},{t:'Adenosina 6mg IV',ok:false},{t:'β-bloqueador para estabilizar',ok:false}],exp:'No BAV 3º grau com QRS largo, atropina geralmente NÃO funciona (bloqueio infranodal). Pode tentar, mas sem atrasar MPTC.'},
+    {vitals:[['FC','40/min','bad'],['Atropina','Sem resposta','bad']],narrative:'Atropina não elevou FC. Paciente segue instável.',prompt:'Próximo passo?',opts:[{t:'MPTC (60–80/min) e/ou dopamina 5–20 mcg/kg/min ou epinefrina 2–10 mcg/min',ok:true},{t:'Repetir atropina indefinidamente',ok:false},{t:'Aguardar melhora espontânea',ok:false},{t:'Iniciar RCP mesmo com pulso',ok:false}],exp:'Atropina ineficaz → MPTC + cronotrópicos (dopamina ou epinefrina). Sedar consciente para MPTC. Confirmar captura elétrica E mecânica.'},
+    {vitals:[['MPTC','Captura confirmada',''],['PA','104/62',''],['FC','70 marcapasso','']],narrative:'MPTC com captura elétrica e mecânica. PA 104/62. Paciente mais alerta.',prompt:'Conduta de continuidade?',opts:[{t:'Consultar especialista + preparar estimulação transvenosa + tratar causa subjacente',ok:true},{t:'Desligar MPTC já que melhorou',ok:false},{t:'Alta imediata',ok:false},{t:'Fibrinolítico',ok:false}],exp:'MPTC é ponte para estimulação transvenosa (e possível marca-passo definitivo). Consultar especialista + investigar causa.'},
+  ]},
+  {title:'Caso 4 — Taquicardia',steps:[
+    {vitals:[['Consciência','Sonolento','warn'],['FC','190/min','bad'],['PA','82/48','bad']],narrative:'Homem 60a. FC 190/min, PA 82/48, sonolento, desconforto torácico. Monitor: taquicardia QRS largo regular.',prompt:'Classificação e conduta imediata?',opts:[{t:'Taquicardia instável (presumir TV) → cardioversão sincronizada imediata',ok:true},{t:'Adenosina 6mg IV',ok:false},{t:'Manobras vagais',ok:false},{t:'Observar — FC alta é tolerável',ok:false}],exp:'Instabilidade + taquicardia = cardioversão sincronizada IMEDIATA. QRS largo → presumir TV. Sedar se possível, sem atrasar.'},
+    {vitals:[['FC','190/min','bad'],['QRS','Largo, uniforme','warn']],narrative:'QRS largo, regular e UNIFORME (monomórfico).',prompt:'Que tipo de choque?',opts:[{t:'Cardioversão SINCRONIZADA (sincronizada com a onda R)',ok:true},{t:'Choque não sincronizado',ok:false},{t:'Não chocar — só medicar',ok:false},{t:'Desfibrilação dupla sequencial',ok:false}],exp:'TV monomórfica COM pulso instável → cardioversão SINCRONIZADA. Apenas TV polimórfica exige choque NÃO sincronizado.'},
+    {vitals:[['Sedação','Disponível','']],narrative:'Paciente consciente, sonolento. Segundos antes da cardioversão.',prompt:'Antes do choque, se possível:',opts:[{t:'IV + sedar — mas NÃO atrasar se deteriorar',ok:true},{t:'Adiar cardioversão até sedação plena, custe o que custar',ok:false},{t:'Pular sedação sempre',ok:false},{t:'Fibrinolítico antes',ok:false}],exp:'Sedar quando possível, mas a cardioversão de paciente instável/deteriorando NÃO deve ser atrasada pela sedação.'},
+    {vitals:[['Ritmo','Sinusal',''],['PA','118/70',''],['FC','88','']],narrative:'Cardioversão converte para ritmo sinusal. PA 118/70, FC 88, mais alerto.',prompt:'Conduta após conversão?',opts:[{t:'Identificar/tratar causa, ECG 12 derivações, monitorar, especialista',ok:true},{t:'Alta imediata',ok:false},{t:'Nova cardioversão profilática',ok:false},{t:'Suspender monitorização',ok:false}],exp:'Pós-conversão: investigar causa (isquemia? eletrólitos?), ECG 12 derivações, manter monitor, antiarrítmico de manutenção com especialista.'},
+  ]},
+];
+
+// ============ RECALL CARDS ============
+const recallCards=[
+  {deck:'PCR',q:'Descreva todos os parâmetros da RCP de alta qualidade (numéricos).',model:'RCP de alta qualidade = compressões fortes e rápidas com mínima interrupção.',keys:['Frequência 100–120/min','Profundidade ≥5 cm (evitar >6 cm)','Retorno total do tórax a cada compressão','Interrupções ≤10 seg','Trocar compressor ≤2 min','Evitar hiperventilação','Com via avançada: 1 vent/6 seg']},
+  {deck:'PCR',q:'Descreva a sequência completa de medicamentos na PCR por FV (o quê, quando, dose).',model:'Na FV/TVSP os medicamentos entram intercalados com ciclos de RCP e choque.',keys:['Epinefrina 1mg IV/IO a cada 3–5 min (após 2º choque)','Amiodarona 300mg IV/IO após 3º choque','2ª dose amiodarona: 150mg','Alternativa: lidocaína 1–1,5 mg/kg','Choque + RCP imediata após cada choque','Buscar Hs e Ts em paralelo']},
+  {deck:'PCR',q:'Liste os 5 Hs e 5 Ts com tratamento de cada um.',model:'Os Hs e Ts são as causas potencialmente reversíveis a buscar e tratar.',keys:['Hipovolemia → volume rápido','Hipóxia → via aérea/O₂','H⁺ acidemia → bicarbonato se grave','Hipo/Hipercalemia → eletrólitos','Hipotermia → reaquecimento ativo','Pneumotórax → agulha 2º EIC LMC','Tamponamento → pericardiocentese','Toxinas → antídotos específicos','Trombose pulmonar (TEP) → fibrinólise','Trombose coronária → ICP']},
+  {deck:'Bradicardia',q:'Paciente FC 38, hipotenso, confuso. Descreva conduta completa.',model:'Bradicardia instável exige tratamento sequencial sistemático.',keys:['Via aérea, O₂ se hipóxico, monitor, IV, ECG 12 derivações','1ª linha: Atropina 1mg IV (máx 3mg, a cada 3–5 min)','Se ineficaz: MPTC 60–80/min (confirmar captura elétrica E mecânica)','E/ou Dopamina 5–20 mcg/kg/min OU Epinefrina 2–10 mcg/min','Especialista → estimulação transvenosa','NÃO confiar na atropina em Mobitz II / BAV 3º grau QRS largo']},
+  {deck:'Taquicardia',q:'Diferencie conduta: instável vs estável, QRS estreito vs largo.',model:'Pulso + estabilidade + largura do QRS guiam o algoritmo completo.',keys:['INSTÁVEL (qualquer): cardioversão sincronizada imediata','Exceção: TV polimórfica → choque NÃO sincronizado','ESTÁVEL + estreito regular (TSV): vagal → adenosina 6mg','ESTÁVEL + estreito irregular (FA): controle frequência','ESTÁVEL + largo regular (TV): amiodarona 150mg em 10 min','FC ≥150 mais provável de causar instabilidade']},
+  {deck:'AVC',q:'Descreva janela temporal, dose e critérios de PA para alteplase no AVC isquêmico.',model:'Alteplase tem janela estreita e exige controle pressórico rigoroso.',keys:['Janela: ≤3h (ou ≤4,5h em selecionados)','Dose: 0,9 mg/kg IV (máx 90mg)','10% bolus em 1 min, restante em 60 min','PA deve ser ≤185/110 ANTES de iniciar','Se alta: labetalol 10–20mg IV ou nicardipina','Hemorragia na TC = CI absoluta','Não anticoagular/antiplaquetário por 24h']},
+  {deck:'AVC',q:'Descreva a Escala de Cincinnati (CPSS) e probabilidade de AVC.',model:'CPSS é a triagem pré-hospitalar rápida de AVC.',keys:['Face: pedir sorriso → buscar assimetria','Braço: estender com olhos fechados → buscar queda','Fala: repetir frase → arrastada/errada/ausente','1 achado anormal = ~72% probabilidade de AVC','Avaliação leva <1 minuto']},
+  {deck:'SCA',q:'Defina IAMST no ECG e descreva os tempos-alvo de reperfusão.',model:'ECG é o exame central para classificar e tratar SCA.',keys:['Supra ST ≥1mm em ≥2 derivações contíguas','V2–V3: ≥2mm (homens <40a: ≥2,5mm; mulheres: ≥1,5mm)','OU BRE novo/supostamente novo','Porta-balão (ICP): ≤90 min','Transferência para ICP: ≤120 min','Porta-agulha (fibrinolítico): ≤30 min']},
+  {deck:'Pós-PCR',q:'Descreva os pilares do cuidado pós-PCR (oxigenação, hemodinâmica, temperatura, neuro).',model:'Cuidado pós-PCR é multissistêmico — proteger o cérebro.',keys:['SpO₂ 92–98% (evitar hiperóxia)','ETCO₂ 35–40 mmHg, evitar hiperventilação','PAS ≥90 mmHg / PAM ≥65, vasopressores se preciso','ECG: IAMST → ICP imediata','CDT: 32–36°C por 24h, tratar febre ativamente','Neuroprognóstico só após ≥72h, multimodal']},
+  {deck:'Via Aérea',q:'Descreva como confirmar posição do tubo orotraqueal (todos os métodos).',model:'Confirmação de posição é obrigatória e deve usar múltiplos métodos.',keys:['Inspeção: expansão torácica bilateral','Ausculta epigástrica: ausência de borborigmos','Ausculta bilateral: MV presente e simétrico','Capnografia de forma de onda: confirmatória (ETCO₂ detectado)','Radiografia de tórax: profundidade definitiva (2–4 cm acima carina)']},
+  {deck:'Situações Esp.',q:'Descreva o manejo da PCR em gestante (ações específicas adicionais).',model:'PCR em gestação exige RCP padrão + ações obstétricas específicas.',keys:['RCP de alta qualidade padrão','Deslocamento uterino esquerdo manual (≥20 semanas)','Buscar causas específicas: hemorragia, líquido amniótico, eclâmpsia','Cesariana de emergência se sem RCE em ≤5 min','Notificar equipe obstétrica e neonatal simultaneamente']},
+];
+
+// ============ ALGORITHM RENDERER ============
+function showAlgo(key,btn){
+  document.querySelectorAll('[data-algo]').forEach(b=>b.classList.remove('primary'));
+  btn.classList.add('primary');
+  const a=algos[key];
+  let html=`<div class="algo-box"><h3 style="font-size:1.1rem;font-weight:800;color:${a.color};margin-bottom:24px">${a.title}</h3>`;
+  a.steps.forEach(s=>{
+    html+=`<div class="algo-step"><div class="step-num ${s.color}">${s.num}</div><div class="step-content"><h4>${s.title}</h4><p>${s.content}</p></div></div>`;
+  });
+  html+='</div>';
+  document.getElementById('algoContent').innerHTML=html;
+}
+
+// ============ ATLAS ============
+let atlasIdx=0;
+function renderPager(){
+  document.getElementById('rhythmPager').innerHTML=rhythms.map((r,i)=>
+    `<button class="rhythm-chip ${i===atlasIdx?'active':''}" onclick="setAtlas(${i})">${r.name.split('(')[0].trim()}</button>`
+  ).join('');
+}
+function setAtlas(i){atlasIdx=i;renderAtlas();}
+function renderAtlas(){
+  renderPager();
+  const r=rhythms[atlasIdx];
+  const danger=['fv','tv','tvpoli','asystole','aesp'].includes(r.id);
+  document.getElementById('atlasSvg').innerHTML=`<path class="ecg-trace ${danger?'danger':''}" d="${rhythmPath(r.id)}"/>`;
+  document.getElementById('atlasHR').textContent=r.hr;
+  document.getElementById('atlasMeta').innerHTML=`
+    <div class="rhythm-name">${r.name}</div>
+    <span class="rhythm-cat cat-${r.cat}">${r.catLabel}</span>
+    <div class="crit-grid">${Object.entries(r.crit).map(([k,v])=>`<div class="crit"><div class="crit-label">${k}</div><div class="crit-val">${v}</div></div>`).join('')}</div>
+    <div class="theory-block"><h4>Teoria</h4><p>${r.theory}</p></div>
+    <div class="conduct"><b>✓ Conduta SAVC:</b> ${r.conduct}</div>
+    <div class="pitfall"><b>⚠ Armadilha:</b> ${r.pitfall}</div>`;
+}
+
+// ============ TRAIN ============
+let trainCurrent=null,trainHits=0,trainTries=0;
+function nextTrain(){
+  const r=rhythms[Math.floor(Math.random()*rhythms.length)];
+  trainCurrent=r;
+  const danger=['fv','tv','tvpoli','asystole','aesp'].includes(r.id);
+  document.getElementById('trainSvg').innerHTML=`<path class="ecg-trace ${danger?'danger':''}" d="${rhythmPath(r.id)}"/>`;
+  document.getElementById('trainHR').textContent=r.hr;
+  const others=rhythms.filter(x=>x.id!==r.id).sort(()=>Math.random()-.5).slice(0,3);
+  const opts=[r,...others].sort(()=>Math.random()-.5);
+  document.getElementById('trainOpts').innerHTML=opts.map(o=>`<button class="train-opt" data-id="${o.id}" onclick="answerTrain('${o.id}')">${o.name}</button>`).join('');
+  document.getElementById('trainFeedback').className='train-feedback';
+  document.getElementById('trainFeedback').innerHTML='';
+  document.getElementById('trainNext').style.display='none';
+}
+function answerTrain(id){
+  trainTries++;
+  const correct=id===trainCurrent.id;
+  if(correct)trainHits++;
+  document.querySelectorAll('.train-opt').forEach(b=>{
+    b.classList.add('locked');
+    if(b.dataset.id===trainCurrent.id)b.classList.add('correct');
+    else if(b.dataset.id===id)b.classList.add('incorrect');
+  });
+  const fb=document.getElementById('trainFeedback');
+  fb.className='train-feedback show '+(correct?'right':'wrong');
+  fb.innerHTML=`<div style="font-weight:700;margin-bottom:8px">${correct?'✓ Correto!':'✗ Era: '+trainCurrent.name}</div>
+    <div style="font-size:.85rem;line-height:1.6;color:var(--text2)"><b>Conduta:</b> ${trainCurrent.conduct}</div>`;
+  document.getElementById('trainNext').style.display='';
+  document.getElementById('trainScore').textContent=`${trainHits} acertos · ${trainTries} tentativas · ${Math.round(trainHits/trainTries*100)}%`;
+}
+
+// ============ RECALL ============
+let recallIdx=0,recallRated={forte:0,medio:0,fraco:0},recallDeck='all';
+function renderRecallDecks(){
+  const decks=['all',...new Set(recallCards.map(c=>c.deck))];
+  document.getElementById('recallDecks').innerHTML=decks.map(d=>
+    `<button class="btn ${d===recallDeck?'primary':''}" onclick="setRecallDeck('${d}')">${d==='all'?'Todos':d}</button>`
+  ).join('');
+}
+function setRecallDeck(d){recallDeck=d;recallIdx=0;renderRecallDecks();renderRecall();}
+function currentRecallList(){return recallDeck==='all'?recallCards:recallCards.filter(c=>c.deck===recallDeck);}
+function renderRecall(){
+  const list=currentRecallList();
+  if(!list.length)return;
+  const c=list[recallIdx%list.length];
+  document.getElementById('recallTag').textContent=c.deck;
+  document.getElementById('recallQ').textContent=c.q;
+  document.getElementById('recallInput').value='';
+  document.getElementById('modelAnswer').className='model-answer';
+  document.getElementById('selfRate').className='self-rate';
+  document.getElementById('revealBtn').style.display='';
+  document.getElementById('modelText').textContent=c.model;
+  document.getElementById('modelKeys').innerHTML=c.keys.map(k=>`<div class="keypoint">${k}</div>`).join('');
+}
+function revealModel(){
+  document.getElementById('modelAnswer').className='model-answer show';
+  document.getElementById('selfRate').className='self-rate show';
+  document.getElementById('revealBtn').style.display='none';
+}
+function rateRecall(level){
+  recallRated[level]++;
+  document.getElementById('recallScore').textContent=`Domino: ${recallRated.forte} · Parcial: ${recallRated.medio} · Revisar: ${recallRated.fraco}`;
+  nextRecall();
+}
+function nextRecall(){recallIdx++;renderRecall();}
+
+// ============ MEGACODE ============
+let megaCase=0,megaStep=0,megaScore=0,megaAnswered=false;
+function startMega(idx){
+  megaCase=idx;megaStep=0;megaScore=0;
+  document.getElementById('megaSelect').style.display='none';
+  document.getElementById('megaGame').style.display='';
+  renderMega();
+}
+function renderMega(){
+  const c=megacases[megaCase];
+  const g=document.getElementById('megaGame');
+  if(megaStep>=c.steps.length){
+    const pct=Math.round(megaScore/c.steps.length*100);
+    const col=pct>=84?'var(--accent3)':pct>=70?'var(--yellow)':'var(--accent)';
+    g.innerHTML=`<div class="mega-scene"><div class="mega-result">
+      <div class="mega-score" style="color:${col}">${pct}%</div>
+      <div style="font-family:'Space Mono',monospace;font-size:.75rem;color:var(--text2);margin-top:8px">${megaScore} de ${c.steps.length} decisões corretas</div>
+      <p style="color:var(--text2);margin-top:14px;font-size:.9rem">${pct>=84?'✓ Liderança sólida. Você conduziria este Megacode com segurança.':pct>=70?'⚡ Quase lá. Revise os passos errados.':'✗ Revise o algoritmo antes de repetir.'}</p>
+      <div style="display:flex;gap:10px;justify-content:center;margin-top:24px;flex-wrap:wrap">
+        <button class="btn primary" onclick="startMega(${megaCase})">Repetir caso</button>
+        <button class="btn" onclick="backToMegaSelect()">Outros casos</button>
+      </div></div></div>`;
+    return;
+  }
+  megaAnswered=false;
+  const s=c.steps[megaStep];
+  const dots=c.steps.map((_,i)=>`<div class="mega-dot ${i<megaStep?'done':i===megaStep?'current':''}"></div>`).join('');
+  g.innerHTML=`<div class="mega-progress">${dots}</div>
+    <div class="mega-scene">
+      <div style="font-family:'Space Mono',monospace;font-size:.62rem;color:var(--text3);margin-bottom:12px;letter-spacing:.06em">${c.title} · PASSO ${megaStep+1}/${c.steps.length}</div>
+      <div class="mega-vitals">${s.vitals.map(v=>`<div class="vital ${v[2]}">${v[0]}: <b>${v[1]}</b></div>`).join('')}</div>
+      <div class="mega-narrative">${s.narrative}</div>
+      <div class="mega-prompt">${s.prompt}</div>
+      <div class="mega-opts">${s.opts.map((o,i)=>`<button class="mega-opt" data-i="${i}" onclick="answerMega(${i})">${o.t}</button>`).join('')}</div>
+      <div class="mega-exp" id="megaExp">💡 ${s.exp}</div>
+    </div>
+    <div style="display:flex;justify-content:center;margin-top:12px">
+      <button class="btn primary" id="megaNextBtn" style="display:none" onclick="megaNext()">${megaStep<c.steps.length-1?'Próximo passo →':'Ver resultado'}</button>
+    </div>`;
+}
+function answerMega(i){
+  if(megaAnswered)return;
+  megaAnswered=true;
+  const s=megacases[megaCase].steps[megaStep];
+  const correctIdx=s.opts.findIndex(o=>o.ok);
+  if(s.opts[i].ok)megaScore++;
+  document.querySelectorAll('.mega-opt').forEach((b,bi)=>{
+    b.classList.add('locked');
+    if(bi===correctIdx)b.classList.add('correct');
+    else if(bi===i)b.classList.add('wrong');
+  });
+  document.getElementById('megaExp').classList.add('show');
+  document.getElementById('megaNextBtn').style.display='';
+}
+function megaNext(){megaStep++;renderMega();}
+function backToMegaSelect(){
+  document.getElementById('megaGame').style.display='none';
+  document.getElementById('megaSelect').style.display='';
+}
+
+// ============ FLASHCARDS ============
+let currentDeck=[],currentIndex=0,isFlipped=false,failedCards=[],knownCards=[];
+function loadDeck(type){
+  currentDeck=type==='all'?[...allCards]:allCards.filter(c=>c.deck===type);
+  currentIndex=0;failedCards=[];knownCards=[];isFlipped=false;
+  showCard();updateProgress();
+}
+function showCard(){
+  if(!currentDeck.length)return;
+  const card=currentDeck[currentIndex];
+  document.getElementById('flashcard').classList.remove('flipped');
+  isFlipped=false;
+  const labels={pcr:'PCR',sca:'SCA',avc:'AVC',brady:'BRADICARDIA',taqui:'TAQUICARDIA',pospcr:'PÓS-PCR',farma:'FARMACOLOGIA',sistemas:'SISTEMAS',via_aerea:'VIA AÉREA',sit_esp:'SIT. ESPECIAIS',equipes:'EQUIPES'};
+  document.getElementById('cardTag').textContent=labels[card.deck]||card.deck.toUpperCase();
+  document.getElementById('cardQuestion').textContent=card.q;
+  document.getElementById('cardAnswer').innerHTML=card.a.replace(/\n/g,'<br>');
+  document.getElementById('cardCounter').textContent=`${currentIndex+1} / ${currentDeck.length}`;
+  document.getElementById('btnFail').style.display='none';
+  document.getElementById('btnOk').style.display='none';
+  updateStats();
+}
+function flipCard(){
+  document.getElementById('flashcard').classList.toggle('flipped');
+  isFlipped=!isFlipped;
+  if(isFlipped){document.getElementById('btnFail').style.display='';document.getElementById('btnOk').style.display='';}
+}
+function nextCard(){currentIndex=(currentIndex+1)%currentDeck.length;showCard();}
+function prevCard(){currentIndex=(currentIndex-1+currentDeck.length)%currentDeck.length;showCard();}
+function markCard(known){
+  const card=currentDeck[currentIndex];
+  if(known){knownCards.push(card);failedCards=failedCards.filter(c=>c!==card);}
+  else{failedCards.push(card);knownCards=knownCards.filter(c=>c!==card);}
+  nextCard();
+}
+function shuffleDeck(){
+  for(let i=currentDeck.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[currentDeck[i],currentDeck[j]]=[currentDeck[j],currentDeck[i]];}
+  currentIndex=0;showCard();
+}
+function showOnlyFailed(){
+  if(!failedCards.length){alert('Nenhum card marcado como errado!');return;}
+  currentDeck=[...failedCards];currentIndex=0;showCard();
+}
+function updateStats(){
+  const pct=currentDeck.length?Math.round(knownCards.length/currentDeck.length*100):0;
+  document.getElementById('deckStats').textContent=`✓ ${knownCards.length} dominadas · ✗ ${failedCards.length} a revisar · ${pct}% do deck`;
+}
+function updateProgress(){
+  const done=knownCards.length,total=allCards.length;
+  const pct=total?(done/total*100).toFixed(0):0;
+  document.getElementById('progressFill').style.width=pct+'%';
+  document.getElementById('progressLabel').textContent=`${done} / ${total} cards`;
+}
+
+// ============ QUIZ ============
+let currentQ=0,quizScore=0,answeredQs=[],quizActive=false;
+function startQuiz(){
+  currentQ=0;quizScore=0;
+  answeredQs=new Array(quizQuestions.length).fill(null);
+  quizActive=true;renderQuestion();
+}
+function renderQuestion(){
+  const container=document.getElementById('quizContent');
+  if(currentQ>=quizQuestions.length){
+    const pct=Math.round(quizScore/quizQuestions.length*100);
+    const color=pct>=84?'var(--accent3)':pct>=70?'var(--yellow)':'var(--accent)';
+    container.innerHTML=`<div class="quiz-score">
+      <div class="score-num" style="color:${color}">${pct}%</div>
+      <div class="score-label">${quizScore} de ${quizQuestions.length} questões corretas</div>
+      <p style="color:var(--text2);margin-top:12px;font-size:.9rem">${pct>=84?'✓ Aprovado! Acima de 84% (mínimo para certificação SAVC)':pct>=70?'⚡ Perto! Revise os temas errados.':'✗ Abaixo do mínimo. Revise algoritmos e flashcards.'}</p>
+      <button class="btn primary" style="margin-top:24px" onclick="startQuiz()">Refazer Quiz</button>
+    </div>`;return;
+  }
+  const q=quizQuestions[currentQ];
+  const answered=answeredQs[currentQ];
+  const opts=q.opts.map((opt,i)=>{
+    let cls='quiz-opt';
+    if(answered!==null){cls+=' disabled';if(i===q.correct)cls+=' correct';else if(i===answered)cls+=' wrong';}
+    return `<button class="${cls}" onclick="answerQ(${i})">${opt}</button>`;
+  }).join('');
+  container.innerHTML=`<div class="quiz-card">
+    <div style="font-family:'Space Mono',monospace;font-size:.65rem;color:var(--text3);margin-bottom:12px">QUESTÃO ${currentQ+1} DE ${quizQuestions.length} · ACERTOS: ${quizScore}</div>
+    <div class="quiz-q">${q.q}</div>
+    <div class="quiz-options">${opts}</div>
+    <div class="explanation ${answered!==null?'show':''}" id="quizExp">💡 ${q.exp}</div>
+  </div>
+  <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+    <button class="btn" onclick="prevQ()">← Anterior</button>
+    <button class="btn primary" onclick="nextQ()">${currentQ<quizQuestions.length-1?'Próxima →':'Ver Resultado'}</button>
+  </div>`;
+}
+function answerQ(idx){
+  if(answeredQs[currentQ]!==null)return;
+  answeredQs[currentQ]=idx;
+  if(idx===quizQuestions[currentQ].correct)quizScore++;
+  renderQuestion();
+}
+function nextQ(){if(currentQ<=quizQuestions.length){currentQ++;renderQuestion();}}
+function prevQ(){if(currentQ>0){currentQ--;renderQuestion();}}
+
+// ============ INIT ============
+loadDeck('all');
+setTimeout(()=>{
+  renderPager();renderAtlas();
+  nextTrain();
+  renderRecallDecks();renderRecall();
+  const b=document.querySelector('[data-algo=pcr]');
+  if(b)showAlgo('pcr',b);
+},150);
+
+</script>
+</body>
+</html>

@@ -1,0 +1,11 @@
+{
+  "appId": "com.savc.superapp",
+  "appName": "SAVC Super App",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https"
+  },
+  "android": {
+    "allowMixedContent": true
+  }
+}
